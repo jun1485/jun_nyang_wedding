@@ -20,7 +20,7 @@ export interface WeddingData {
     name: string;
     address: string;
     transportations: {
-      type: "지하철" | "버스" | "주차 안내";
+      type: "지하철" | "버스" | "주차 안내" | "셔틀";
       details: string;
     }[];
   };
