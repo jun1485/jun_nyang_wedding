@@ -24,7 +24,7 @@ export const WEDDING_DATA: WeddingData = {
   weddingDateTime: "2026-05-16T14:00:00",
   venue: {
     // 최신 공식 명칭 반영
-    name: "더링크서울 트리뷰트 포트폴리오 호텔 웨딩",
+    name: "더링크서울 호텔 웨딩",
     address: "서울특별시 구로구 경인로 610",
     transportations: [
       { type: "지하철", details: "2호선 신도림역" },

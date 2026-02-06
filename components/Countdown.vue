@@ -1,35 +1,22 @@
 <template>
   <div class="text-center">
-    <p
-      class="text-2xl md:text-3xl font-light mb-6"
-      style="text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3)"
-    >
-      우리의 결혼식까지 남은 시간
-    </p>
-    <div class="grid grid-cols-4 gap-4">
-      <div
-        class="p-4 bg-white bg-opacity-25 rounded-lg shadow-lg text-gray-800"
-      >
-        <p class="text-4xl font-bold">{{ time.days }}</p>
-        <p class="text-sm">Days</p>
+    <p class="count-title text-sm sm:text-base">결혼식이 피어나는 순간까지</p>
+    <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+      <div class="count-card">
+        <p class="count-value">{{ time.days }}</p>
+        <p class="count-label">Days</p>
       </div>
-      <div
-        class="p-4 bg-white bg-opacity-25 rounded-lg shadow-lg text-gray-800"
-      >
-        <p class="text-4xl font-bold">{{ time.hours }}</p>
-        <p class="text-sm">Hours</p>
+      <div class="count-card">
+        <p class="count-value">{{ time.hours }}</p>
+        <p class="count-label">Hours</p>
       </div>
-      <div
-        class="p-4 bg-white bg-opacity-25 rounded-lg shadow-lg text-gray-800"
-      >
-        <p class="text-4xl font-bold">{{ time.minutes }}</p>
-        <p class="text-sm">Minutes</p>
+      <div class="count-card">
+        <p class="count-value">{{ time.minutes }}</p>
+        <p class="count-label">Minutes</p>
       </div>
-      <div
-        class="p-4 bg-white bg-opacity-25 rounded-lg shadow-lg text-gray-800"
-      >
-        <p class="text-4xl font-bold">{{ time.seconds }}</p>
-        <p class="text-sm">Seconds</p>
+      <div class="count-card">
+        <p class="count-value">{{ time.seconds }}</p>
+        <p class="count-label">Seconds</p>
       </div>
     </div>
   </div>
@@ -52,7 +39,7 @@ const time = ref({
   seconds: "00",
 });
 
-let interval: NodeJS.Timeout;
+let interval: ReturnType<typeof setInterval> | null = null;
 
 const updateCountdown = () => {
   const target = new Date(props.targetDate).getTime();
@@ -60,7 +47,13 @@ const updateCountdown = () => {
   const difference = target - now;
 
   if (difference <= 0) {
-    if (interval) clearInterval(interval);
+    time.value = {
+      days: "00",
+      hours: "00",
+      minutes: "00",
+      seconds: "00",
+    };
+    if (interval !== null) clearInterval(interval);
     return;
   }
 
@@ -85,6 +78,39 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (interval) clearInterval(interval);
+  if (interval !== null) clearInterval(interval);
 });
 </script>
+
+<style scoped>
+.count-title {
+  margin: 0;
+  color: #6f5360;
+  font-family: "Gaegu", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.count-card {
+  border-radius: 0.9rem;
+  border: 1px solid rgba(231, 90, 132, 0.22);
+  background: rgba(255, 255, 255, 0.84);
+  padding: 0.7rem 0.45rem;
+}
+
+.count-value {
+  margin: 0;
+  color: #422f39;
+  font-size: clamp(1.35rem, 5vw, 2.05rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.count-label {
+  margin: 0.2rem 0 0;
+  color: #8d6f7d;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+</style>

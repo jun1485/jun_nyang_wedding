@@ -7,7 +7,7 @@ await weddingStore.fetchWeddingData();
 </script>
 
 <template>
-  <div class="app-container">
+  <div class="app-container app-surface">
     <client-only>
       <FlowerPetals />
     </client-only>
@@ -18,20 +18,14 @@ await weddingStore.fetchWeddingData();
 </template>
 
 <style>
-/* 기본 폰트 및 배경 설정 */
-body {
-  font-family: "Pretendard", sans-serif;
-  background-color: #fff;
-  color: #333;
-}
-
 .app-container {
   position: relative;
+  min-height: 100dvh;
 }
 
 .content-wrapper {
   position: relative;
-  z-index: 1;
-  background-color: transparent; /* 콘텐츠 배경을 투명하게 하여 WebGL 캔버스가 보이도록 함 */
+  z-index: 1; /* 콘텐츠가 WebGL 배경 위에 오도록 고정 */
+  background-color: transparent;
 }
 </style>
