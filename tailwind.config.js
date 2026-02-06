@@ -3,8 +3,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Quicksand", "sans-serif"],
-        display: ["Dancing Script", "cursive"],
+        sans: ["Gaegu", "sans-serif"],
+        display: ["Gaegu", "sans-serif"],
       },
     },
   },

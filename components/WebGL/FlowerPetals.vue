@@ -12,17 +12,35 @@ let renderer: THREE.WebGLRenderer | null = null;
 let scene: THREE.Scene | null = null;
 let camera: THREE.OrthographicCamera | null = null;
 let petals: THREE.Mesh[] = [];
-// 핵심 로직: 장미 테마에 맞는 꽃잎 수/색감 조절 및 저사양 기기 보호
-const deviceMemory = (navigator as any)?.deviceMemory || 4;
+let animationFrameId: number | null = null;
+let sharedGeometry: THREE.PlaneGeometry | null = null;
+let sharedMaterial: THREE.MeshBasicMaterial | null = null;
+let sharedTexture: THREE.Texture | null = null;
+
+// SSR 안전성: 브라우저 전역(window/navigator)은 클라이언트에서만 접근
+const isClient = typeof window !== "undefined";
+const isMobile = isClient
+  ? window.matchMedia("(max-width: 767px)").matches
+  : false;
+const deviceMemory =
+  isClient
+    ? ((window.navigator as Navigator & { deviceMemory?: number })
+        .deviceMemory ?? 4)
+    : 4;
 const prefersReducedMotion =
-  typeof window !== "undefined" &&
-  window.matchMedia &&
+  isClient &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const BASE_PETAL_COUNT = 140;
+const BASE_PETAL_COUNT = isMobile ? 90 : 140;
 const PETAL_COUNT = prefersReducedMotion
-  ? 40
-  : Math.round(BASE_PETAL_COUNT * Math.min(1, deviceMemory / 4));
+  ? isMobile
+    ? 20
+    : 36
+  : Math.max(
+      36,
+      Math.round(BASE_PETAL_COUNT * Math.min(1, deviceMemory / (isMobile ? 6 : 4)))
+    );
+const FRUSTUM_HEIGHT = isMobile ? 4.4 : 5;
 
 let isPaused = false;
 let visibilityHandler: (() => void) | null = null;
@@ -35,40 +53,37 @@ const createPetals = () => {
   if (!scene) return;
 
   const textureLoader = new THREE.TextureLoader();
-  const petalTexture = textureLoader.load("/textures/petal.svg");
+  sharedTexture = textureLoader.load("/textures/petal.svg");
 
-  const petalGeometry = new THREE.PlaneGeometry(0.2, 0.2); // 크기를 약간 키웠습니다.
-  const petalMaterial = new THREE.MeshBasicMaterial({
-    map: petalTexture,
+  sharedGeometry = new THREE.PlaneGeometry(0.2, 0.2);
+  sharedMaterial = new THREE.MeshBasicMaterial({
+    map: sharedTexture,
     side: THREE.DoubleSide,
     transparent: true,
-    alphaTest: 0.1, // SVG의 투명한 부분이 완전히 투명하게 처리되도록 설정
+    alphaTest: 0.1,
   });
 
   for (let i = 0; i < PETAL_COUNT; i++) {
-    const material = petalMaterial.clone();
-    // 각 꽃잎의 투명도/색감(장미 계열 tint)을 무작위로 설정하여 깊이감을 줍니다.
-    material.opacity = Math.random() * 0.5 + 0.4; // 0.4 ~ 0.9
+    const material = sharedMaterial.clone();
+    material.opacity = Math.random() * 0.5 + 0.4;
 
-    const petal = new THREE.Mesh(petalGeometry, material);
+    const petal = new THREE.Mesh(sharedGeometry, material);
 
-    // 초기 위치를 화면 전체에 무작위로 설정
     petal.position.set(
-      (Math.random() - 0.5) * 10, // x
-      Math.random() * 10 - 5, // y (시작 위치를 좀 더 넓게 분포)
-      0 // z
+      (Math.random() - 0.5) * 10,
+      Math.random() * FRUSTUM_HEIGHT - FRUSTUM_HEIGHT / 2,
+      0
     );
 
-    // 크기를 무작위로 설정하여 자연스러움을 더합니다.
-    const scale = Math.random() * 0.5 + 0.5; // 0.5 ~ 1.0
+    const scale = Math.random() * 0.5 + 0.5;
     petal.scale.set(scale, scale, scale);
 
-    (petal as any).speed = prefersReducedMotion
-      ? Math.random() * 0.003 + 0.001
-      : Math.random() * 0.006 + 0.002;
-    (petal as any).rotationSpeedX = (Math.random() - 0.5) * 0.02;
-    (petal as any).rotationSpeedY = (Math.random() - 0.5) * 0.02;
-    (petal as any).sway = Math.random() * Math.PI;
+    petal.userData.speed = prefersReducedMotion
+      ? Math.random() * 0.002 + 0.001
+      : Math.random() * (isMobile ? 0.0045 : 0.006) + 0.002;
+    petal.userData.rotationSpeedX = (Math.random() - 0.5) * 0.015;
+    petal.userData.rotationSpeedY = (Math.random() - 0.5) * 0.015;
+    petal.userData.sway = Math.random() * Math.PI;
 
     petals.push(petal);
     scene.add(petal);
@@ -83,31 +98,31 @@ const animate = () => {
 
   if (!isPaused) {
     const aspect = window.innerWidth / window.innerHeight;
-    const frustumHeight = 5;
 
     petals.forEach((petal) => {
-      // 아래로 떨어지는 움직임
-      petal.position.y -= (petal as any).speed;
+      const speed = Number(petal.userData.speed ?? 0.003);
+      const sway = Number(petal.userData.sway ?? 0);
+      const rotationSpeedX = Number(petal.userData.rotationSpeedX ?? 0);
+      const rotationSpeedY = Number(petal.userData.rotationSpeedY ?? 0);
 
-      // 좌우로 흔들리는 움직임 (Sway)
-      (petal as any).sway += (petal as any).speed * 0.4;
-      petal.position.x += Math.sin((petal as any).sway) * 0.002;
+      petal.position.y -= speed;
 
-      // 회전
-      petal.rotation.x += (petal as any).rotationSpeedX;
-      petal.rotation.y += (petal as any).rotationSpeedY;
+      petal.userData.sway = sway + speed * 0.4;
+      petal.position.x += Math.sin(Number(petal.userData.sway)) * 0.002;
 
-      // 꽃잎이 화면 밖으로 나가면 다시 위에서 시작하도록 위치를 재설정합니다.
-      if (petal.position.y < -frustumHeight / 2 - 0.1) {
-        petal.position.y = frustumHeight / 2 + 0.1;
-        petal.position.x = (Math.random() - 0.5) * frustumHeight * aspect;
+      petal.rotation.x += rotationSpeedX;
+      petal.rotation.y += rotationSpeedY;
+
+      if (petal.position.y < -FRUSTUM_HEIGHT / 2 - 0.1) {
+        petal.position.y = FRUSTUM_HEIGHT / 2 + 0.1;
+        petal.position.x = (Math.random() - 0.5) * FRUSTUM_HEIGHT * aspect;
       }
     });
 
     renderer.render(scene, camera);
   }
 
-  requestAnimationFrame(animate);
+  animationFrameId = requestAnimationFrame(animate);
 };
 
 /**
@@ -119,14 +134,13 @@ const handleResize = () => {
   const width = window.innerWidth;
   const height = window.innerHeight;
   const aspect = width / height;
-  const frustumHeight = 5;
 
-  renderer.setSize(width, height);
+  renderer.setSize(width, height, false);
 
-  camera.left = (-frustumHeight * aspect) / 2;
-  camera.right = (frustumHeight * aspect) / 2;
-  camera.top = frustumHeight / 2;
-  camera.bottom = -frustumHeight / 2;
+  camera.left = (-FRUSTUM_HEIGHT * aspect) / 2;
+  camera.right = (FRUSTUM_HEIGHT * aspect) / 2;
+  camera.top = FRUSTUM_HEIGHT / 2;
+  camera.bottom = -FRUSTUM_HEIGHT / 2;
   camera.updateProjectionMatrix();
 };
 
@@ -138,12 +152,11 @@ onMounted(() => {
 
   // Camera
   const aspect = window.innerWidth / window.innerHeight;
-  const frustumHeight = 5;
   camera = new THREE.OrthographicCamera(
-    (-frustumHeight * aspect) / 2,
-    (frustumHeight * aspect) / 2,
-    frustumHeight / 2,
-    -frustumHeight / 2,
+    (-FRUSTUM_HEIGHT * aspect) / 2,
+    (FRUSTUM_HEIGHT * aspect) / 2,
+    FRUSTUM_HEIGHT / 2,
+    -FRUSTUM_HEIGHT / 2,
     0.1,
     1000
   );
@@ -152,10 +165,11 @@ onMounted(() => {
   // Renderer
   renderer = new THREE.WebGLRenderer({
     canvas: canvas.value,
-    antialias: true,
-    alpha: true, // 배경을 투명하게 처리
+    antialias: !isMobile,
+    alpha: true,
+    powerPreference: isMobile ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
   handleResize();
 
   // Create Petals
@@ -176,20 +190,30 @@ onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
   if (visibilityHandler)
     document.removeEventListener("visibilitychange", visibilityHandler);
+  if (animationFrameId != null) cancelAnimationFrame(animationFrameId);
 
-  // 메모리 누수 방지를 위해 Three.js 객체들을 정리합니다.
   if (scene) {
     petals.forEach((petal) => {
-      petal.geometry.dispose();
-      (petal.material as THREE.Material[]).forEach((m) => m.dispose());
+      if (Array.isArray(petal.material)) {
+        petal.material.forEach((m) => m.dispose());
+      } else {
+        petal.material.dispose();
+      }
       scene?.remove(petal);
     });
   }
+  sharedGeometry?.dispose();
+  sharedMaterial?.dispose();
+  sharedTexture?.dispose();
+  sharedGeometry = null;
+  sharedMaterial = null;
+  sharedTexture = null;
   renderer?.dispose();
   renderer = null;
   scene = null;
   camera = null;
   petals = [];
+  animationFrameId = null;
 });
 </script>
 
@@ -200,7 +224,7 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   outline: none;
-  z-index: 0; /* 다른 콘텐츠 뒤에 위치하도록 설정 */
-  pointer-events: none; /* 인터랙션을 가리지 않도록 */
+  z-index: 0;
+  pointer-events: none;
 }
 </style>

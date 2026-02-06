@@ -1,63 +1,64 @@
 <template>
-  <div class="bg-gray-100 font-sans">
+  <div class="font-sans text-[var(--text-main)]">
     <MusicPlayer />
-    <div
-      class="min-h-screen flex flex-col items-center justify-center bg-cover bg-center text-white"
-      :style="{
-        backgroundImage:
-          'url(https://images.unsplash.com/photo-1522673607524-6a67d7595a78)',
-      }"
+    <section
+      class="relative flex min-h-[100svh] items-center justify-center px-4 py-10 sm:px-6 sm:py-16"
     >
-      <div
-        class="bg-black bg-opacity-50 min-h-screen w-full flex flex-col items-center justify-center"
-      >
-        <div class="text-center p-8 max-w-2xl mx-auto">
-          <h1
-            class="text-5xl md:text-7xl font-display mb-4"
-            style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5)"
-          >
-            {{ store.groom?.titleName }} & {{ store.bride?.titleName }}
-          </h1>
-          <p
-            class="text-2xl md:text-4xl text-gray-200 mb-8 font-display"
-            style="text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5)"
-          >
-            Our Wedding
-          </p>
+      <div class="w-full max-w-4xl">
+        <div class="section-card relative overflow-hidden px-5 py-8 sm:px-10 sm:py-12">
+          <div class="hero-blush hero-blush-left" aria-hidden="true"></div>
+          <div class="hero-blush hero-blush-right" aria-hidden="true"></div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-12">
-            <div class="text-center">
-              <p class="text-3xl md:text-4xl font-semibold">
-                {{ store.groom?.name }}
-              </p>
-              <p class="text-gray-300 mt-2">Groom</p>
+          <div class="relative z-[1] text-center">
+            <span class="floral-chip mb-5">Blooming Day</span>
+            <h1 class="hero-title text-4xl sm:text-5xl md:text-7xl">
+              <span class="md:inline">{{ store.groom?.titleName }}</span>
+              <span class="ampersand block md:inline mx-2">&</span>
+              <span class="md:inline">{{ store.bride?.titleName }}</span>
+            </h1>
+            <p class="hero-subtitle mt-2 text-2xl sm:text-3xl md:text-4xl">
+              Our Wedding
+            </p>
+
+            <div class="mt-8 grid grid-cols-2 gap-3 sm:gap-4">
+              <div class="name-card">
+                <p class="text-xl font-semibold sm:text-3xl">
+                  {{ store.groom?.name }}
+                </p>
+                <p class="mt-1 text-xs uppercase tracking-[0.2em] text-[#8c6d7c]">
+                  Groom
+                </p>
+              </div>
+              <div class="name-card">
+                <p class="text-xl font-semibold sm:text-3xl">
+                  {{ store.bride?.name }}
+                </p>
+                <p class="mt-1 text-xs uppercase tracking-[0.2em] text-[#8c6d7c]">
+                  Bride
+                </p>
+              </div>
             </div>
-            <div class="text-center">
-              <p class="text-3xl md:text-4xl font-semibold">
-                {{ store.bride?.name }}
-              </p>
-              <p class="text-gray-300 mt-2">Bride</p>
+
+            <div class="mt-8 rounded-2xl bg-white/65 px-3 py-4 sm:px-4 sm:py-5">
+              <Countdown
+                v-if="store.weddingData?.weddingDateTime"
+                :target-date="store.weddingData.weddingDateTime"
+              />
             </div>
-          </div>
 
-          <div class="mb-12">
-            <Countdown
-              v-if="store.weddingData?.weddingDateTime"
-              :target-date="store.weddingData.weddingDateTime"
-            />
-          </div>
-
-          <div
-            class="bg-white bg-opacity-20 p-8 rounded-lg shadow-lg backdrop-blur-sm text-gray-800"
-          >
-            <p class="text-3xl md:text-4xl font-light mb-4">{{ store.date }}</p>
-            <p class="text-2xl md:text-3xl">{{ store.venue?.name }}</p>
+            <div class="mt-8 rounded-2xl border border-rose-200/60 bg-white/78 px-4 py-4 sm:px-6">
+              <p class="text-base font-semibold text-[#624652] sm:text-2xl">
+                {{ store.date }} · {{ store.time }}
+              </p>
+              <p class="mt-1 text-sm text-[#7a5b68] sm:text-lg">
+                {{ store.venue?.name }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Sections -->
     <Invitation />
     <Gallery />
     <Venue />
@@ -66,34 +67,96 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { useWeddingStore } from "~/stores/wedding";
 
 const store = useWeddingStore();
+const seoTitle = computed(
+  () => `${store.groom?.name} & ${store.bride?.name}의 결혼식에 초대합니다`
+);
+const seoDescription = computed(
+  () =>
+    `${store.date} ${store.venue?.name}에서 열리는 저희의 결혼식에 오셔서 자리를 빛내주시길 바랍니다.`
+);
 
 // SEO 및 메타 태그 설정
-useHead({
-  title: `${store.groom?.name} & ${store.bride?.name}의 결혼식에 초대합니다`,
-  meta: [
-    {
-      name: "description",
-      content: `${store.date} ${store.venue?.name}에서 열리는 저희의 결혼식에 오셔서 자리를 빛내주시길 바랍니다.`,
-    },
-    {
-      property: "og:title",
-      content: `${store.groom?.name} & ${store.bride?.name}의 결혼식`,
-    },
-    {
-      property: "og:description",
-      content: "저희의 새로운 시작을 함께 축복해주세요.",
-    },
-    { property: "og:image", content: "/og-image.jpg" }, // 나중에 대표 이미지를 public 폴더에 추가하면 좋습니다.
-  ],
+useHead(() => {
+  return {
+    title: seoTitle.value,
+    meta: [
+      {
+        name: "description",
+        content: seoDescription.value,
+      },
+      {
+        property: "og:title",
+        content: `${store.groom?.name} & ${store.bride?.name}의 결혼식`,
+      },
+      {
+        property: "og:description",
+        content: "저희의 새로운 시작을 함께 축복해주세요.",
+      },
+      { property: "og:image", content: "/og-image.jpg" },
+    ],
+  };
 });
 </script>
 
 <style scoped>
-/* Using font-display from tailwind.config.js */
-.font-display {
-  font-family: "Dancing Script", cursive;
+.hero-title,
+.hero-subtitle {
+  font-family: "Gaegu", sans-serif;
+}
+
+.hero-title {
+  margin: 0;
+  color: #432f3a;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.hero-subtitle {
+  color: #5f4552;
+}
+
+.ampersand {
+  font-size: clamp(2.2rem, 9vw, 4.3rem);
+  color: #d64e75;
+}
+
+.name-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(231, 90, 132, 0.18);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.95rem 0.75rem;
+}
+
+.hero-blush {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 9999px;
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+.hero-blush-left {
+  top: -110px;
+  left: -90px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 205, 219, 0.55) 0%,
+    rgba(255, 205, 219, 0) 72%
+  );
+}
+
+.hero-blush-right {
+  right: -90px;
+  bottom: -110px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 229, 188, 0.55) 0%,
+    rgba(255, 229, 188, 0) 72%
+  );
 }
 </style>
