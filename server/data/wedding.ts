@@ -20,7 +20,7 @@ export const WEDDING_DATA: WeddingData = {
     ],
   },
   date: "2026년 5월 16일",
-  time: "오후 2시",
+  time: "오후 3시",
   weddingDateTime: "2026-05-16T14:00:00",
   venue: {
     // 최신 공식 명칭 반영

@@ -1,12 +1,14 @@
 <template>
-  <canvas ref="canvas" class="webgl-canvas"></canvas>
+  <canvas ref="canvas" :class="flowerPetalStyles.canvas"></canvas>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import * as THREE from "three";
+import { useEmotionStyles } from "~/composables/useEmotionStyles";
 
 const canvas = ref<HTMLCanvasElement | null>(null);
+const { flowerPetalStyles } = useEmotionStyles();
 
 let renderer: THREE.WebGLRenderer | null = null;
 let scene: THREE.Scene | null = null;
@@ -216,15 +218,3 @@ onUnmounted(() => {
   animationFrameId = null;
 });
 </script>
-
-<style scoped>
-.webgl-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  outline: none;
-  z-index: 0;
-  pointer-events: none;
-}
-</style>
