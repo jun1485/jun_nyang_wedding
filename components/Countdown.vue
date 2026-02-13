@@ -1,22 +1,22 @@
 <template>
-  <div class="text-center">
-    <p class="count-title text-sm sm:text-base">결혼식이 피어나는 순간까지</p>
-    <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
-      <div class="count-card">
-        <p class="count-value">{{ time.days }}</p>
-        <p class="count-label">Days</p>
+  <div :class="countdownStyles.root">
+    <p :class="countdownStyles.title">결혼식이 피어나는 순간까지</p>
+    <div :class="countdownStyles.grid">
+      <div :class="countdownStyles.card">
+        <p :class="countdownStyles.value">{{ time.days }}</p>
+        <p :class="countdownStyles.label">Days</p>
       </div>
-      <div class="count-card">
-        <p class="count-value">{{ time.hours }}</p>
-        <p class="count-label">Hours</p>
+      <div :class="countdownStyles.card">
+        <p :class="countdownStyles.value">{{ time.hours }}</p>
+        <p :class="countdownStyles.label">Hours</p>
       </div>
-      <div class="count-card">
-        <p class="count-value">{{ time.minutes }}</p>
-        <p class="count-label">Minutes</p>
+      <div :class="countdownStyles.card">
+        <p :class="countdownStyles.value">{{ time.minutes }}</p>
+        <p :class="countdownStyles.label">Minutes</p>
       </div>
-      <div class="count-card">
-        <p class="count-value">{{ time.seconds }}</p>
-        <p class="count-label">Seconds</p>
+      <div :class="countdownStyles.card">
+        <p :class="countdownStyles.value">{{ time.seconds }}</p>
+        <p :class="countdownStyles.label">Seconds</p>
       </div>
     </div>
   </div>
@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+import { useEmotionStyles } from "~/composables/useEmotionStyles";
 
 const props = defineProps({
   targetDate: {
@@ -32,6 +33,7 @@ const props = defineProps({
   },
 });
 
+const { countdownStyles } = useEmotionStyles();
 const time = ref({
   days: "00",
   hours: "00",
@@ -81,36 +83,3 @@ onUnmounted(() => {
   if (interval !== null) clearInterval(interval);
 });
 </script>
-
-<style scoped>
-.count-title {
-  margin: 0;
-  color: #6f5360;
-  font-family: "Gaegu", sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-}
-
-.count-card {
-  border-radius: 0.9rem;
-  border: 1px solid rgba(231, 90, 132, 0.22);
-  background: rgba(255, 255, 255, 0.84);
-  padding: 0.7rem 0.45rem;
-}
-
-.count-value {
-  margin: 0;
-  color: #422f39;
-  font-size: clamp(1.35rem, 5vw, 2.05rem);
-  font-weight: 700;
-  line-height: 1.1;
-}
-
-.count-label {
-  margin: 0.2rem 0 0;
-  color: #8d6f7d;
-  font-size: 0.72rem;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-</style>

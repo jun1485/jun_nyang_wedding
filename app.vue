@@ -1,31 +1,20 @@
 <script setup lang="ts">
-import { useWeddingStore } from "~/stores/wedding";
+import { useEmotionStyles } from "~/composables/useEmotionStyles";
 import FlowerPetals from "~/components/WebGL/FlowerPetals.vue";
+import { useWeddingStore } from "~/stores/wedding";
 
+const { appStyles } = useEmotionStyles();
 const weddingStore = useWeddingStore();
 await weddingStore.fetchWeddingData();
 </script>
 
 <template>
-  <div class="app-container app-surface">
+  <div :class="appStyles.container">
     <client-only>
       <FlowerPetals />
     </client-only>
-    <main class="content-wrapper">
+    <main :class="appStyles.contentWrapper">
       <NuxtPage />
     </main>
   </div>
 </template>
-
-<style>
-.app-container {
-  position: relative;
-  min-height: 100dvh;
-}
-
-.content-wrapper {
-  position: relative;
-  z-index: 1; /* 콘텐츠가 WebGL 배경 위에 오도록 고정 */
-  background-color: transparent;
-}
-</style>

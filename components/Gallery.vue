@@ -1,41 +1,37 @@
 <template>
-  <section class="section-wrap pt-1 sm:pt-2">
-    <div class="text-center">
-      <span class="floral-chip">Gallery</span>
-      <h2 class="section-title mt-4 text-3xl sm:text-4xl">우리의 순간</h2>
-      <p class="section-subtitle mt-2">사진을 누르면 크게 볼 수 있어요</p>
+  <section :class="[sharedStyles.sectionWrap, galleryStyles.sectionOffset]">
+    <div :class="galleryStyles.header">
+      <span :class="sharedStyles.floralChip">Gallery</span>
+      <h2 :class="[sharedStyles.sectionTitle, galleryStyles.title]">우리의 순간</h2>
+      <p :class="[sharedStyles.sectionSubtitle, galleryStyles.subtitle]">사진을 누르면 크게 볼 수 있어요</p>
     </div>
 
-    <div class="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+    <div :class="galleryStyles.grid">
       <button
         v-for="(image, index) in store.galleryImages"
         :key="index"
         type="button"
-        class="group relative block aspect-[3/4] overflow-hidden rounded-2xl border border-rose-100 bg-white/75 shadow-md outline-none"
+        :class="galleryStyles.thumbButton"
         @click="openLightbox(index)"
       >
         <img
           :src="image.src"
           :alt="image.alt"
           loading="lazy"
-          class="h-full w-full object-cover transition-transform duration-300 group-active:scale-[1.02] sm:group-hover:scale-105"
+          :class="galleryStyles.thumbImage"
         />
-        <div
-          class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2 text-left text-xs text-white"
-        >
-          {{ index + 1 }}번째 추억
-        </div>
+        <div :class="galleryStyles.thumbCaption">{{ index + 1 }}번째 추억</div>
       </button>
     </div>
 
     <div
       v-if="isLightboxOpen"
-      class="fixed inset-0 z-[70] flex items-center justify-center bg-[#1e1018]/95 p-2 sm:p-4"
+      :class="galleryStyles.overlay"
       @click.self="closeLightbox"
     >
       <button
         type="button"
-        class="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[71] flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-white/20 text-white backdrop-blur-sm"
+        :class="galleryStyles.closeButton"
         @click="closeLightbox"
         aria-label="닫기"
       >
@@ -45,7 +41,7 @@
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          class="h-5 w-5"
+          :class="galleryStyles.icon"
         >
           <path
             stroke-linecap="round"
@@ -56,19 +52,17 @@
       </button>
 
       <div
-        class="relative flex h-full w-full select-none items-center justify-center overflow-hidden rounded-2xl"
+        :class="galleryStyles.stage"
         @touchstart="onTouchStart"
         @touchmove.prevent="onTouchMove"
         @touchend="onTouchEnd"
       >
         <img
           v-if="currentImage"
+          ref="lightboxImage"
           :src="currentImage.src"
           :alt="currentImage.alt"
-          class="max-h-[84svh] max-w-[92vw] object-contain transition-transform duration-200"
-          :style="{
-            transform: `translateX(${dragOffsetX}px) scale(${zoomScale})`,
-          }"
+          :class="galleryStyles.lightboxImage"
           @dblclick="toggleZoom"
         />
       </div>
@@ -76,7 +70,7 @@
       <button
         v-if="hasPrev"
         type="button"
-        class="absolute left-2 top-1/2 z-[71] -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-white/20 text-white backdrop-blur-sm sm:left-4"
+        :class="[galleryStyles.navButton, galleryStyles.navButtonLeft]"
         @click.stop="prevImage"
         aria-label="이전"
       >
@@ -86,7 +80,7 @@
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          class="h-5 w-5"
+          :class="galleryStyles.icon"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
@@ -95,7 +89,7 @@
       <button
         v-if="hasNext"
         type="button"
-        class="absolute right-2 top-1/2 z-[71] -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-white/20 text-white backdrop-blur-sm sm:right-4"
+        :class="[galleryStyles.navButton, galleryStyles.navButtonRight]"
         @click.stop="nextImage"
         aria-label="다음"
       >
@@ -105,15 +99,13 @@
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          class="h-5 w-5"
+          :class="galleryStyles.icon"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </button>
 
-      <div
-        class="absolute bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-1/2 z-[71] -translate-x-1/2 rounded-full bg-white/15 px-3 py-1 text-xs text-white backdrop-blur-sm"
-      >
+      <div :class="galleryStyles.counter">
         {{ (selectedIndex ?? 0) + 1 }} / {{ totalImages }}
       </div>
     </div>
@@ -121,10 +113,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
+import { useEmotionStyles } from "~/composables/useEmotionStyles";
 import { useWeddingStore } from "~/stores/wedding";
 
 const store = useWeddingStore();
+const { sharedStyles, galleryStyles } = useEmotionStyles();
 
 const isLightboxOpen = ref(false);
 const selectedIndex = ref<number | null>(null);
@@ -132,6 +126,7 @@ const zoomScale = ref(1);
 const dragOffsetX = ref(0);
 const touchStartX = ref(0);
 const touchStartY = ref(0);
+const lightboxImage = ref<HTMLImageElement | null>(null);
 
 const images = computed(() => store.galleryImages);
 const totalImages = computed(() => images.value?.length ?? 0);
@@ -144,11 +139,28 @@ const hasNext = computed(
     selectedIndex.value != null && selectedIndex.value < totalImages.value - 1
 );
 
+function syncImageTransform() {
+  if (!lightboxImage.value) return;
+  lightboxImage.value.style.transform = `translateX(${dragOffsetX.value}px) scale(${zoomScale.value})`;
+}
+
+function lockBodyScroll() {
+  document.body.classList.add("wedding-no-scroll");
+}
+
+function unlockBodyScroll() {
+  document.body.classList.remove("wedding-no-scroll");
+}
+
 function openLightbox(index: number) {
   if (!images.value || images.value.length === 0) return;
   selectedIndex.value = index;
   isLightboxOpen.value = true;
-  document.body.style.overflow = "hidden";
+  lockBodyScroll();
+
+  void nextTick(() => {
+    syncImageTransform();
+  });
 }
 
 function closeLightbox() {
@@ -156,7 +168,7 @@ function closeLightbox() {
   selectedIndex.value = null;
   dragOffsetX.value = 0;
   zoomScale.value = 1;
-  document.body.style.overflow = "";
+  unlockBodyScroll();
 }
 
 function prevImage() {
@@ -164,6 +176,10 @@ function prevImage() {
     selectedIndex.value -= 1;
     dragOffsetX.value = 0;
     zoomScale.value = 1;
+
+    void nextTick(() => {
+      syncImageTransform();
+    });
   }
 }
 
@@ -172,11 +188,16 @@ function nextImage() {
     selectedIndex.value += 1;
     dragOffsetX.value = 0;
     zoomScale.value = 1;
+
+    void nextTick(() => {
+      syncImageTransform();
+    });
   }
 }
 
 function toggleZoom() {
   zoomScale.value = zoomScale.value === 1 ? 2 : 1;
+  syncImageTransform();
 }
 
 function onTouchStart(e: TouchEvent) {
@@ -184,6 +205,7 @@ function onTouchStart(e: TouchEvent) {
   touchStartX.value = e.touches[0].clientX;
   touchStartY.value = e.touches[0].clientY;
   dragOffsetX.value = 0;
+  syncImageTransform();
 }
 
 function onTouchMove(e: TouchEvent) {
@@ -192,11 +214,13 @@ function onTouchMove(e: TouchEvent) {
   const dy = e.touches[0].clientY - touchStartY.value;
   if (Math.abs(dy) > Math.abs(dx)) return;
   dragOffsetX.value = dx;
+  syncImageTransform();
 }
 
 function onTouchEnd() {
   if (zoomScale.value > 1) {
     dragOffsetX.value = 0;
+    syncImageTransform();
     return;
   }
 
@@ -207,6 +231,7 @@ function onTouchEnd() {
     nextImage();
   }
   dragOffsetX.value = 0;
+  syncImageTransform();
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -224,6 +249,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener("keydown", onKeydown);
-  document.body.style.overflow = "";
+  unlockBodyScroll();
 });
 </script>
