@@ -6,8 +6,6 @@ export default defineNuxtPlugin(() => {
   if (isInjected) return;
 
   injectGlobal`
-    @import url("https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=block");
-
     :root {
       --petal-50: #fff9fb;
       --petal-100: #ffeef3;
@@ -28,6 +26,17 @@ export default defineNuxtPlugin(() => {
     body,
     #__nuxt {
       min-height: 100%;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    @media (max-width: 639px) {
+      html {
+        font-size: 17px;
+      }
     }
 
     body {

@@ -30,6 +30,8 @@ export function useMusicPlayer() {
   const currentSrc = computed(() => PLAYLIST[currentIndex.value]);
 
   let resumeOnUserGesture: (() => void) | null = null;
+  let visibilityChangeHandler: (() => void) | null = null;
+  let pageHideHandler: (() => void) | null = null;
   // #endregion
 
   // #region 볼륨 제어
@@ -148,6 +150,13 @@ export function useMusicPlayer() {
         }
       });
   }
+
+  /** 백그라운드/화면 꺼짐 대응 - 브라우저 비가시 상태에서 오디오 정지 유지 */
+  function pauseOnHiddenState() {
+    if (!audioPlayer.value) return;
+    audioPlayer.value.pause();
+    isPlaying.value = false;
+  }
   // #endregion
 
   // #region 라이프사이클
@@ -155,12 +164,32 @@ export function useMusicPlayer() {
     currentIndex.value = Math.floor(Math.random() * PLAYLIST.length);
     if (audioPlayer.value) audioPlayer.value.load();
     tryAutoplay();
+
+    visibilityChangeHandler = () => {
+      if (document.visibilityState === "hidden") {
+        pauseOnHiddenState();
+      }
+    };
+    pageHideHandler = () => {
+      pauseOnHiddenState();
+    };
+
+    document.addEventListener("visibilitychange", visibilityChangeHandler);
+    window.addEventListener("pagehide", pageHideHandler);
   });
 
   onUnmounted(() => {
     if (resumeOnUserGesture) {
       window.removeEventListener("pointerdown", resumeOnUserGesture);
       window.removeEventListener("keydown", resumeOnUserGesture);
+    }
+
+    if (visibilityChangeHandler) {
+      document.removeEventListener("visibilitychange", visibilityChangeHandler);
+    }
+
+    if (pageHideHandler) {
+      window.removeEventListener("pagehide", pageHideHandler);
     }
   });
   // #endregion

@@ -11,7 +11,10 @@
         <span
           v-for="(line, index) in store.invitationMessage ?? []"
           :key="index"
-          :class="invitationStyles.messageLine"
+          :class="[
+            invitationStyles.messageLine,
+            isMessageSectionBreak(line) ? invitationStyles.messageLineSectionGap : '',
+          ]"
         >
           {{ line }}
         </span>
@@ -34,4 +37,10 @@ import { useWeddingStore } from "~/stores/wedding";
 
 const store = useWeddingStore();
 const { sharedStyles, invitationStyles } = useEmotionStyles();
+
+const MESSAGE_SECTION_BREAK_LINE = "이제 평생을 약속하려 합니다.";
+
+function isMessageSectionBreak(line: string): boolean {
+  return line === MESSAGE_SECTION_BREAK_LINE;
+}
 </script>
