@@ -4,8 +4,14 @@
     <section :class="homeStyles.heroSection">
       <div :class="homeStyles.heroInner">
         <div :class="[sharedStyles.sectionCard, homeStyles.heroCard]">
-          <div :class="[homeStyles.heroBlush, homeStyles.heroBlushLeft]" aria-hidden="true"></div>
-          <div :class="[homeStyles.heroBlush, homeStyles.heroBlushRight]" aria-hidden="true"></div>
+          <div
+            :class="[homeStyles.heroBlush, homeStyles.heroBlushLeft]"
+            aria-hidden="true"
+          ></div>
+          <div
+            :class="[homeStyles.heroBlush, homeStyles.heroBlushRight]"
+            aria-hidden="true"
+          ></div>
 
           <div :class="homeStyles.heroContent">
             <span :class="sharedStyles.floralChip">Blooming Day</span>
@@ -39,7 +45,9 @@
             </div>
 
             <div :class="homeStyles.dateCard">
-              <p :class="homeStyles.dateText">{{ store.date }} · {{ store.time }}</p>
+              <p :class="homeStyles.dateText">
+                {{ store.date }} {{ store.time }}
+              </p>
               <p :class="homeStyles.venueText">{{ store.venue?.name }}</p>
             </div>
           </div>
@@ -62,11 +70,11 @@ import { useWeddingStore } from "~/stores/wedding";
 const store = useWeddingStore();
 const { sharedStyles, homeStyles } = useEmotionStyles();
 const seoTitle = computed(
-  () => `${store.groom?.name} & ${store.bride?.name}의 결혼식에 초대합니다`
+  () => `${store.groom?.name} & ${store.bride?.name}의 결혼식에 초대합니다`,
 );
 const seoDescription = computed(
   () =>
-    `${store.date} ${store.venue?.name}에서 열리는 저희의 결혼식에 오셔서 자리를 빛내주시길 바랍니다.`
+    `${store.date} ${store.venue?.name}에서 열리는 저희의 결혼식에 오셔서 자리를 빛내주시길 바랍니다.`,
 );
 
 // SEO 및 메타 태그 설정

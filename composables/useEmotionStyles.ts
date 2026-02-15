@@ -5,8 +5,26 @@ const SM_BREAKPOINT = "640px";
 const MD_BREAKPOINT = "768px";
 // #endregion
 
+// #region Emotion 라벨링
+function toKebabCase(value: string): string {
+  return value.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+}
+
+function withEmotionLabels<T extends Record<string, string>>(
+  scope: string,
+  styles: T,
+): T {
+  const entries = Object.entries(styles).map(([key, className]) => {
+    const labelClassName = `${scope}__${toKebabCase(key)}`;
+    return [key, `${labelClassName} ${className}`];
+  });
+
+  return Object.fromEntries(entries) as T;
+}
+// #endregion
+
 // #region 공통 스타일
-const sharedStyles = {
+const sharedStyles = withEmotionLabels("shared", {
   sectionWrap: css`
     width: 100%;
     max-width: 980px;
@@ -23,6 +41,22 @@ const sharedStyles = {
     background: rgba(255, 255, 255, 0.76);
     backdrop-filter: blur(8px);
     box-shadow: 0 18px 40px rgba(215, 63, 109, 0.12);
+    animation: section-card-fade-up 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+    @keyframes section-card-fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   `,
   sectionTitle: css`
     margin: 0;
@@ -50,6 +84,18 @@ const sharedStyles = {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 1.75rem;
+    animation: floral-chip-fade-in 420ms ease-out both;
+
+    @keyframes floral-chip-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     &::before {
       content: "✿";
@@ -69,17 +115,27 @@ const sharedStyles = {
     text-decoration: none;
     cursor: pointer;
     box-shadow: 0 10px 20px rgba(215, 63, 109, 0.2);
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      filter 180ms ease;
 
     &:focus-visible {
       outline: 2px solid rgba(231, 90, 132, 0.35);
       outline-offset: 2px;
     }
+
+    &:active {
+      transform: translateY(1px) scale(0.985);
+      box-shadow: 0 6px 14px rgba(215, 63, 109, 0.22);
+      filter: saturate(0.95);
+    }
   `,
-} as const;
+} as const);
 // #endregion
 
 // #region 앱 스타일
-const appStyles = {
+const appStyles = withEmotionLabels("app", {
   container: css`
     position: relative;
     min-height: 100dvh;
@@ -122,11 +178,11 @@ const appStyles = {
     z-index: 1;
     background-color: transparent;
   `,
-} as const;
+} as const);
 // #endregion
 
 // #region 홈 스타일
-const homeStyles = {
+const homeStyles = withEmotionLabels("home", {
   root: css`
     color: var(--text-main);
   `,
@@ -296,11 +352,11 @@ const homeStyles = {
       font-size: 1.125rem;
     }
   `,
-} as const;
+} as const);
 // #endregion
 
 // #region 연락처 스타일
-const contactStyles = {
+const contactStyles = withEmotionLabels("contact", {
   sectionOffset: css`
     padding-top: 0.5rem;
 
@@ -388,11 +444,11 @@ const contactStyles = {
     text-decoration: none;
     padding: 0.45rem 0.75rem;
   `,
-} as const;
+} as const);
 // #endregion
 
 // #region 카운트다운 스타일
-const countdownStyles = {
+const countdownStyles = withEmotionLabels("countdown", {
   root: css`
     text-align: center;
   `,
@@ -439,11 +495,11 @@ const countdownStyles = {
     letter-spacing: 0.07em;
     text-transform: uppercase;
   `,
-} as const;
+} as const);
 // #endregion
 
 // #region 갤러리 스타일
-const galleryStyles = {
+const galleryStyles = withEmotionLabels("gallery", {
   sectionOffset: css`
     && {
       padding: 0.25rem 0 2.75rem;
@@ -479,6 +535,7 @@ const galleryStyles = {
   grid: css`
     margin-top: 1.75rem;
     display: grid;
+    padding: 1rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
 
@@ -498,31 +555,28 @@ const galleryStyles = {
     aspect-ratio: 3 / 4;
     overflow: hidden;
     border-radius: 1rem;
-    border: 1px solid rgba(255, 228, 230, 1);
-    background: rgba(255, 255, 255, 0.75);
+    border: 0;
+    padding: 0;
+    background: transparent;
+    appearance: none;
+    -webkit-appearance: none;
     box-shadow: 0 4px 6px rgba(15, 23, 42, 0.08);
     outline: none;
-    cursor: pointer;
+    cursor: default;
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease;
 
-    &:only-child {
-      grid-column: 1 / -1;
+    &:active {
+      transform: scale(0.985);
+      box-shadow: 0 3px 5px rgba(15, 23, 42, 0.12);
     }
   `,
   thumbImage: css`
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s;
-
-    &:active {
-      transform: scale(1.02);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      &:hover {
-        transform: scale(1.05);
-      }
-    }
   `,
   thumbCaption: css`
     position: absolute;
@@ -543,6 +597,16 @@ const galleryStyles = {
     justify-content: center;
     background: rgba(30, 16, 24, 0.95);
     padding: 0.5rem;
+    animation: gallery-overlay-fade-in 220ms ease-out both;
+
+    @keyframes gallery-overlay-fade-in {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
 
     @media (min-width: ${SM_BREAKPOINT}) {
       padding: 1rem;
@@ -579,14 +643,57 @@ const galleryStyles = {
     justify-content: center;
     overflow: hidden;
     border-radius: 1rem;
+    animation: gallery-stage-pop-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+    @keyframes gallery-stage-pop-in {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
   `,
   lightboxImage: css`
     max-height: 84svh;
     max-width: 92vw;
     object-fit: contain;
-    transition: transform 0.2s;
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
     transform: translateX(0) scale(1);
     transform-origin: center center;
+    will-change: transform, opacity;
+  `,
+  lightboxImageEnterNext: css`
+    animation: gallery-image-enter-next 280ms cubic-bezier(0.22, 1, 0.36, 1)
+      both;
+
+    @keyframes gallery-image-enter-next {
+      from {
+        opacity: 0;
+        transform: translateX(30px) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+  `,
+  lightboxImageEnterPrev: css`
+    animation: gallery-image-enter-prev 280ms cubic-bezier(0.22, 1, 0.36, 1)
+      both;
+
+    @keyframes gallery-image-enter-prev {
+      from {
+        opacity: 0;
+        transform: translateX(-30px) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
   `,
   navButton: css`
     position: absolute;
@@ -604,6 +711,16 @@ const galleryStyles = {
     backdrop-filter: blur(4px);
     transform: translateY(-50%);
     cursor: pointer;
+    transition:
+      transform 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease;
+
+    &:active {
+      transform: translateY(-50%) scale(0.92);
+      background: rgba(255, 255, 255, 0.28);
+      border-color: rgba(255, 255, 255, 0.45);
+    }
   `,
   navButtonLeft: css`
     left: 0.5rem;
@@ -632,16 +749,16 @@ const galleryStyles = {
     color: #fff;
     backdrop-filter: blur(4px);
   `,
-} as const;
+} as const);
 // #endregion
 
 // #region 초대장 스타일
-const invitationStyles = {
+const invitationStyles = withEmotionLabels("invitation", {
   card: css`
     position: relative;
     overflow: hidden;
     text-align: center;
-    padding: 2.25rem 1.25rem;
+    padding: 2.25rem 0rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       padding: 3.5rem 3rem;
@@ -669,6 +786,9 @@ const invitationStyles = {
   `,
   messageLine: css`
     display: block;
+  `,
+  messageLineSectionGap: css`
+    margin-bottom: 12px;
   `,
   namesWrap: css`
     margin: 2.25rem auto 0;
@@ -721,11 +841,11 @@ const invitationStyles = {
       rgba(255, 231, 202, 0) 70%
     );
   `,
-} as const;
+} as const);
 // #endregion
 
 // #region 배경음악 스타일
-const musicPlayerStyles = {
+const musicPlayerStyles = withEmotionLabels("music-player", {
   dock: css`
     position: fixed;
     right: 0.9rem;
@@ -740,6 +860,18 @@ const musicPlayerStyles = {
     backdrop-filter: blur(10px);
     padding: 0.32rem 0.45rem 0.32rem 0.35rem;
     box-shadow: 0 10px 24px rgba(205, 87, 125, 0.22);
+    animation: music-dock-slide-up 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+    @keyframes music-dock-slide-up {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     @media (min-width: ${SM_BREAKPOINT}) {
       right: 1.35rem;
@@ -802,11 +934,11 @@ const musicPlayerStyles = {
     letter-spacing: 0.08em;
     padding: 0 0.38rem 0 0.12rem;
   `,
-} as const;
+} as const);
 // #endregion
 
 // #region 예식장 스타일
-const venueStyles = {
+const venueStyles = withEmotionLabels("venue", {
   card: css`
     padding: 2rem 1.25rem;
 
@@ -922,6 +1054,7 @@ const venueStyles = {
     margin: 0.25rem 0 0;
     font-size: 0.875rem;
     color: #6f5864;
+    white-space: pre-line;
   `,
   actionRow: css`
     margin-top: 1.75rem;
@@ -934,11 +1067,11 @@ const venueStyles = {
       gap: 0.75rem;
     }
   `,
-} as const;
+} as const);
 // #endregion
 
 // #region 꽃잎 캔버스 스타일
-const flowerPetalStyles = {
+const flowerPetalStyles = withEmotionLabels("flower-petal", {
   canvas: css`
     position: fixed;
     inset: 0;
@@ -948,7 +1081,7 @@ const flowerPetalStyles = {
     z-index: 0;
     pointer-events: none;
   `,
-} as const;
+} as const);
 // #endregion
 
 // #region 스타일 제공

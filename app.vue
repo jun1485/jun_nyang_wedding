@@ -10,6 +10,7 @@ await weddingStore.fetchWeddingData();
 
 <template>
   <div :class="appStyles.container">
+    <NuxtPwaManifest />
     <client-only>
       <FlowerPetals />
     </client-only>

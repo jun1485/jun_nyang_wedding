@@ -60,9 +60,10 @@
         <img
           v-if="currentImage"
           ref="lightboxImage"
+          :key="currentImageKey"
           :src="currentImage.src"
           :alt="currentImage.alt"
-          :class="galleryStyles.lightboxImage"
+          :class="[galleryStyles.lightboxImage, currentImageMotionClass]"
           @dblclick="toggleZoom"
         />
       </div>
@@ -127,11 +128,23 @@ const dragOffsetX = ref(0);
 const touchStartX = ref(0);
 const touchStartY = ref(0);
 const lightboxImage = ref<HTMLImageElement | null>(null);
+const lightboxImageRenderSeed = ref(0);
+const slideDirection = ref<"next" | "prev">("next");
 
 const images = computed(() => store.galleryImages);
 const totalImages = computed(() => images.value?.length ?? 0);
 const currentImage = computed(() =>
   selectedIndex.value != null ? images.value[selectedIndex.value] : null
+);
+const currentImageKey = computed(() =>
+  currentImage.value
+    ? `${currentImage.value.src}-${lightboxImageRenderSeed.value}`
+    : "lightbox-image-empty"
+);
+const currentImageMotionClass = computed(() =>
+  slideDirection.value === "next"
+    ? galleryStyles.lightboxImageEnterNext
+    : galleryStyles.lightboxImageEnterPrev
 );
 const hasPrev = computed(() => (selectedIndex.value ?? 0) > 0);
 const hasNext = computed(
@@ -154,6 +167,8 @@ function unlockBodyScroll() {
 
 function openLightbox(index: number) {
   if (!images.value || images.value.length === 0) return;
+  slideDirection.value = "next";
+  lightboxImageRenderSeed.value += 1;
   selectedIndex.value = index;
   isLightboxOpen.value = true;
   lockBodyScroll();
@@ -168,30 +183,27 @@ function closeLightbox() {
   selectedIndex.value = null;
   dragOffsetX.value = 0;
   zoomScale.value = 1;
+  lightboxImageRenderSeed.value = 0;
   unlockBodyScroll();
 }
 
 function prevImage() {
   if (hasPrev.value && selectedIndex.value != null) {
+    slideDirection.value = "prev";
+    lightboxImageRenderSeed.value += 1;
     selectedIndex.value -= 1;
     dragOffsetX.value = 0;
     zoomScale.value = 1;
-
-    void nextTick(() => {
-      syncImageTransform();
-    });
   }
 }
 
 function nextImage() {
   if (hasNext.value && selectedIndex.value != null) {
+    slideDirection.value = "next";
+    lightboxImageRenderSeed.value += 1;
     selectedIndex.value += 1;
     dragOffsetX.value = 0;
     zoomScale.value = 1;
-
-    void nextTick(() => {
-      syncImageTransform();
-    });
   }
 }
 
@@ -227,9 +239,14 @@ function onTouchEnd() {
   const threshold = 55;
   if (dragOffsetX.value > threshold) {
     prevImage();
-  } else if (dragOffsetX.value < -threshold) {
-    nextImage();
+    return;
   }
+
+  if (dragOffsetX.value < -threshold) {
+    nextImage();
+    return;
+  }
+
   dragOffsetX.value = 0;
   syncImageTransform();
 }
