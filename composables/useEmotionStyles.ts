@@ -60,7 +60,7 @@ const sharedStyles = withEmotionLabels("shared", {
   `,
   sectionTitle: css`
     margin: 0;
-    font-family: "Gaegu", sans-serif;
+    font-family: var(--font-main), sans-serif;
     font-weight: 700;
     letter-spacing: 0.02em;
     color: #36242f;
@@ -412,7 +412,7 @@ const contactStyles = withEmotionLabels("contact", {
   contactRow: css`
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 0.75rem;
     border: 1px solid rgba(231, 90, 132, 0.15);
     background: rgba(255, 255, 255, 0.78);
@@ -430,20 +430,6 @@ const contactStyles = withEmotionLabels("contact", {
     color: #7f6470;
     font-size: 0.82rem;
   `,
-  callButton: css`
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 3.5rem;
-    border-radius: 9999px;
-    border: 1px solid rgba(231, 90, 132, 0.3);
-    background: #fff3f7;
-    color: #c73e6a;
-    font-size: 0.84rem;
-    font-weight: 700;
-    text-decoration: none;
-    padding: 0.45rem 0.75rem;
-  `,
 } as const);
 // #endregion
 
@@ -452,10 +438,108 @@ const countdownStyles = withEmotionLabels("countdown", {
   root: css`
     text-align: center;
   `,
+  calendarPaper: css`
+    border-radius: 0.75rem;
+    margin: 0 auto 1.5rem;
+    border: 1px solid rgba(199, 186, 157, 0.32);
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 10px 22px rgba(149, 133, 92, 0.08);
+    padding: 0.55rem 0.68rem 0.48rem;
+
+    @media (min-width: ${SM_BREAKPOINT}) {
+      width: min(14rem, 60vw);
+    }
+  `,
+  calendarHead: css`
+    display: flex;
+    align-items: flex-end;
+    gap: 0.4rem;
+  `,
+  calendarMonthNumber: css`
+    margin: 0;
+    color: #d64e75;
+    font-family: var(--font-main), sans-serif;
+    font-size: 2.4rem;
+    line-height: 0.9;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  `,
+  calendarMonthLabel: css`
+    margin: 0 0 0.18rem;
+    color: #8f91ad;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  `,
+  calendarGuide: css`
+    margin: 0.22rem 0 0.4rem;
+    height: 0.92rem;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 0.31rem,
+      rgba(208, 197, 172, 0.55) 0.31rem,
+      rgba(208, 197, 172, 0.55) 0.33rem
+    );
+  `,
+  calendarGrid: css`
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    column-gap: 0.16rem;
+    row-gap: 0.2rem;
+  `,
+  calendarCell: css`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.05rem;
+    color: #8697c2;
+    font-family: var(--font-main), sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    margin: 0.2rem 0;
+  `,
+  calendarCellEmpty: css`
+    opacity: 0;
+  `,
+  calendarCellSunday: css`
+    color: #b49a5e;
+  `,
+  calendarCellSaturday: css`
+    color: #7f95c4;
+  `,
+  calendarCellTarget: css`
+    position: relative;
+    z-index: 0;
+    isolation: isolate;
+    color: #d13114;
+    font-size: 1rem;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+
+    &::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      width: 1.14em;
+      height: 1.02em;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 100% 100%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 22'%3E%3Cpath d='M12 20.4c-.3 0-.6-.1-.8-.3l-1.5-1.4C5.5 14.9 2.7 12.3 2.7 9.1 2.7 6.6 4.6 4.7 7.1 4.7c1.8 0 3.4.9 4.3 2.3.9-1.4 2.5-2.3 4.3-2.3 2.5 0 4.4 1.9 4.4 4.4 0 3.2-2.8 5.8-7 9.6l-1.5 1.4c-.2.2-.5.3-.8.3Z' fill='%23ffb3c8' stroke='%23f06d95' stroke-width='1.45'/%3E%3Ccircle cx='9' cy='8.2' r='1.15' fill='%23fff7fb'/%3E%3C/svg%3E");
+      opacity: 0.96;
+      pointer-events: none;
+      top: 50%;
+      left: 50%;
+      transform: translate(36%, -108%) rotate(8deg);
+    }
+  `,
   title: css`
     margin: 0;
     color: #6f5360;
-    font-family: "Gaegu", sans-serif;
+    font-family: var(--font-main), sans-serif;
     font-weight: 700;
     letter-spacing: 0.06em;
     font-size: 0.875rem;

@@ -10,6 +10,17 @@ export interface Parent {
   tel: string;
 }
 
+export interface RemittanceAccount {
+  label: string;
+  bank: string;
+  accountNumber: string;
+}
+
+export interface RemittanceAccounts {
+  groom: RemittanceAccount[];
+  bride: RemittanceAccount[];
+}
+
 export interface WeddingData {
   groom: Person & { parents: Parent[] };
   bride: Person & { parents: Parent[] };
@@ -25,5 +36,6 @@ export interface WeddingData {
     }[];
   };
   invitationMessage: string[];
+  remittanceAccounts: RemittanceAccounts;
   galleryImages: { src: string; alt: string }[];
 }

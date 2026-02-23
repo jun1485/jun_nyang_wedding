@@ -1,9 +1,11 @@
 import { injectGlobal } from "@emotion/css";
+import { getActiveFontFamily } from "~/composables/useFontPreset";
 
 let isInjected = false;
 
 export default defineNuxtPlugin(() => {
   if (isInjected) return;
+  const activeFontFamily = getActiveFontFamily();
 
   injectGlobal`
     :root {
@@ -15,6 +17,7 @@ export default defineNuxtPlugin(() => {
       --rose-600: #d53f6d;
       --text-main: #3f2a34;
       --text-sub: #715964;
+      --font-main: ${activeFontFamily};
     }
 
     * {
@@ -41,7 +44,7 @@ export default defineNuxtPlugin(() => {
 
     body {
       margin: 0;
-      font-family: "Gaegu", sans-serif;
+      font-family: var(--font-main), sans-serif;
       color: var(--text-main);
       background:
         radial-gradient(
@@ -77,7 +80,7 @@ export default defineNuxtPlugin(() => {
     label,
     strong,
     small {
-      font-family: "Gaegu", sans-serif;
+      font-family: var(--font-main), sans-serif;
     }
 
     .wedding-no-scroll {

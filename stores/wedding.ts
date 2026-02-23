@@ -41,6 +41,9 @@ export const useWeddingStore = defineStore("wedding", () => {
   const invitationMessage = computed(
     () => weddingData.value?.invitationMessage
   );
+  const remittanceAccounts = computed(
+    () => weddingData.value?.remittanceAccounts
+  );
   const galleryImages = computed(
     () => gallery.value ?? weddingData.value?.galleryImages ?? []
   );
@@ -55,6 +58,7 @@ export const useWeddingStore = defineStore("wedding", () => {
     time,
     venue,
     invitationMessage,
+    remittanceAccounts,
     galleryImages,
     error,
   };
