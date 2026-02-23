@@ -1,20 +1,8 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 
-// #region 타입 정의
-interface MusicPlayerState {
-  isPlaying: boolean;
-  isMuted: boolean;
-  volume: number;
-  currentIndex: number;
-}
-// #endregion
-
 // #region 상수
 const INITIAL_VOLUME = 0.1;
-const PLAYLIST = [
-  "/audio/bensound-the-light-between-us.mp3",
-  "/audio/bensound-love.mp3",
-];
+const PLAYLIST = ["/audio/bensound-love.mp3"];
 // #endregion
 
 /**
@@ -30,8 +18,41 @@ export function useMusicPlayer() {
   const currentSrc = computed(() => PLAYLIST[currentIndex.value]);
 
   let resumeOnUserGesture: (() => void) | null = null;
+  let unmuteOnUserGesture: (() => void) | null = null;
   let visibilityChangeHandler: (() => void) | null = null;
   let pageHideHandler: (() => void) | null = null;
+  // #endregion
+
+  // #region 사용자 제스처 이벤트
+  function addUserGestureListeners(
+    handler: () => void,
+    once: boolean = true
+  ) {
+    window.addEventListener("pointerdown", handler, {
+      once,
+      capture: true,
+    });
+    window.addEventListener("touchstart", handler, {
+      once,
+      capture: true,
+      passive: true,
+    });
+    window.addEventListener("click", handler, {
+      once,
+      capture: true,
+    });
+    window.addEventListener("keydown", handler, {
+      once,
+      capture: true,
+    });
+  }
+
+  function removeUserGestureListeners(handler: () => void) {
+    window.removeEventListener("pointerdown", handler, true);
+    window.removeEventListener("touchstart", handler, true);
+    window.removeEventListener("click", handler, true);
+    window.removeEventListener("keydown", handler, true);
+  }
   // #endregion
 
   // #region 볼륨 제어
@@ -97,19 +118,16 @@ export function useMusicPlayer() {
         audioPlayer.value.muted = false;
         audioPlayer.value.volume = volume.value;
         isMuted.value = false;
-        window.removeEventListener("pointerdown", unmute);
-        window.removeEventListener("keydown", unmute);
       };
-      window.addEventListener("pointerdown", unmute, { once: true });
-      window.addEventListener("keydown", unmute, { once: true });
+      unmuteOnUserGesture = unmute;
+      addUserGestureListeners(unmuteOnUserGesture);
       return;
     } catch {
       // 완전 차단 시 첫 제스처에서 재시작
     }
 
     resumeOnUserGesture = () => resumePlayback();
-    window.addEventListener("pointerdown", resumeOnUserGesture, { once: true });
-    window.addEventListener("keydown", resumeOnUserGesture, { once: true });
+    addUserGestureListeners(resumeOnUserGesture);
   }
 
   /** 다음 트랙 재생 */
@@ -141,12 +159,7 @@ export function useMusicPlayer() {
       .catch(() => {
         if (!resumeOnUserGesture) {
           resumeOnUserGesture = () => resumePlayback();
-          window.addEventListener("pointerdown", resumeOnUserGesture, {
-            once: true,
-          });
-          window.addEventListener("keydown", resumeOnUserGesture, {
-            once: true,
-          });
+          addUserGestureListeners(resumeOnUserGesture);
         }
       });
   }
@@ -180,8 +193,11 @@ export function useMusicPlayer() {
 
   onUnmounted(() => {
     if (resumeOnUserGesture) {
-      window.removeEventListener("pointerdown", resumeOnUserGesture);
-      window.removeEventListener("keydown", resumeOnUserGesture);
+      removeUserGestureListeners(resumeOnUserGesture);
+    }
+
+    if (unmuteOnUserGesture) {
+      removeUserGestureListeners(unmuteOnUserGesture);
     }
 
     if (visibilityChangeHandler) {

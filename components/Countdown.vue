@@ -1,5 +1,31 @@
 <template>
   <div :class="countdownStyles.root">
+    <div :class="countdownStyles.calendarPaper" aria-label="예식 달력">
+      <div :class="countdownStyles.calendarHead">
+        <p :class="countdownStyles.calendarMonthNumber">
+          {{ monthlyCalendar.monthNumber }}
+        </p>
+        <p :class="countdownStyles.calendarMonthLabel">
+          {{ monthlyCalendar.monthLabel }}
+        </p>
+      </div>
+      <div :class="countdownStyles.calendarGuide" aria-hidden="true"></div>
+      <div :class="countdownStyles.calendarGrid">
+        <span
+          v-for="cell in monthlyCalendar.cells"
+          :key="cell.key"
+          :class="[
+            countdownStyles.calendarCell,
+            cell.isEmpty ? countdownStyles.calendarCellEmpty : '',
+            cell.isSunday ? countdownStyles.calendarCellSunday : '',
+            cell.isSaturday ? countdownStyles.calendarCellSaturday : '',
+            cell.isTargetDay ? countdownStyles.calendarCellTarget : '',
+          ]"
+        >
+          {{ cell.label }}
+        </span>
+      </div>
+    </div>
     <p :class="countdownStyles.title">결혼식이 피어나는 순간까지</p>
     <div :class="countdownStyles.grid">
       <div :class="countdownStyles.card">
@@ -23,63 +49,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { toRef } from "vue";
+import { useCountdown } from "~/composables/useCountdown";
 import { useEmotionStyles } from "~/composables/useEmotionStyles";
 
-const props = defineProps({
-  targetDate: {
-    type: String,
-    required: true,
-  },
-});
+const props = defineProps<{
+  targetDate: string;
+}>();
 
 const { countdownStyles } = useEmotionStyles();
-const time = ref({
-  days: "00",
-  hours: "00",
-  minutes: "00",
-  seconds: "00",
-});
-
-let interval: ReturnType<typeof setInterval> | null = null;
-
-const updateCountdown = () => {
-  const target = new Date(props.targetDate).getTime();
-  const now = new Date().getTime();
-  const difference = target - now;
-
-  if (difference <= 0) {
-    time.value = {
-      days: "00",
-      hours: "00",
-      minutes: "00",
-      seconds: "00",
-    };
-    if (interval !== null) clearInterval(interval);
-    return;
-  }
-
-  const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-  const hours = Math.floor(
-    (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  );
-  const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-  time.value = {
-    days: String(days).padStart(2, "0"),
-    hours: String(hours).padStart(2, "0"),
-    minutes: String(minutes).padStart(2, "0"),
-    seconds: String(seconds).padStart(2, "0"),
-  };
-};
-
-onMounted(() => {
-  updateCountdown();
-  interval = setInterval(updateCountdown, 1000);
-});
-
-onUnmounted(() => {
-  if (interval !== null) clearInterval(interval);
-});
+const { time, monthlyCalendar } = useCountdown(toRef(props, "targetDate"));
 </script>

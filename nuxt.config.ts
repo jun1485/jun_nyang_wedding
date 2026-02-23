@@ -1,3 +1,5 @@
+import { GOOGLE_FONT_STYLESHEET_URL } from "./composables/useFontPreset";
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: true },
@@ -61,7 +63,7 @@ export default defineNuxtConfig({
         },
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap",
+          href: GOOGLE_FONT_STYLESHEET_URL,
         },
         { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
         { rel: "icon", type: "image/png", href: "/pwa-192.png" },

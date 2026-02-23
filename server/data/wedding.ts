@@ -1,4 +1,40 @@
-import type { WeddingData } from "~/types/wedding";
+import type { RemittanceAccount, WeddingData } from "~/types/wedding";
+
+const GROOM_REMITTANCE_ACCOUNTS: RemittanceAccount[] = [
+  {
+    label: "신랑 주정준",
+    bank: "국민은행",
+    accountNumber: "000000-00-000000",
+  },
+  {
+    label: "신랑 아버지 주진표",
+    bank: "신한은행",
+    accountNumber: "000-000-000000",
+  },
+  {
+    label: "신랑 어머니 장성애",
+    bank: "하나은행",
+    accountNumber: "000-000000-00000",
+  },
+];
+
+const BRIDE_REMITTANCE_ACCOUNTS: RemittanceAccount[] = [
+  {
+    label: "신부 이인영",
+    bank: "우리은행",
+    accountNumber: "000-0000-000000",
+  },
+  {
+    label: "신부 아버지 이덕수",
+    bank: "농협은행",
+    accountNumber: "000-00-000000",
+  },
+  {
+    label: "신부 어머니 정지연",
+    bank: "카카오뱅크",
+    accountNumber: "0000-00-0000000",
+  },
+];
 
 export const WEDDING_DATA: WeddingData = {
   groom: {
@@ -55,6 +91,10 @@ export const WEDDING_DATA: WeddingData = {
     "가장 설레는 시작이 될 그날,",
     "함께 축복해 주세요.",
   ],
+  remittanceAccounts: {
+    groom: GROOM_REMITTANCE_ACCOUNTS,
+    bride: BRIDE_REMITTANCE_ACCOUNTS,
+  },
   galleryImages: Array.from({ length: 6 }, (_, i) => ({
     src: `https://source.unsplash.com/random/500x500?wedding,couple&sig=${
       i + 1
