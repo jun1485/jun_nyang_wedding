@@ -25,3 +25,11 @@ logs
 
 .vercel
 .npm-cache-temp
+
+# Gallery local debug assets (Blob source of truth)
+public/gallery/*.jpg
+public/gallery/*.jpeg
+public/gallery/*.png
+public/gallery/*.webp
+public/gallery/*.gif
+public/gallery/*.avif

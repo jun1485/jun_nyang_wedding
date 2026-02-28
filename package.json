@@ -8,6 +8,8 @@
     "prebuild": "node scripts/generate-gallery-manifest.mjs",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "start": "nuxt preview",
+    "start:output": "node .output/server/index.mjs",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },

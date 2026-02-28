@@ -4,6 +4,22 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: true },
   modules: ["@pinia/nuxt", "@vite-pwa/nuxt"],
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          // three 번들 분리로 초기 청크 용량 축소 및 파싱 비용 분산 적용
+          manualChunks: (id: string) => {
+            if (id.includes("node_modules/three")) {
+              return "three";
+            }
+
+            return undefined;
+          },
+        },
+      },
+    },
+  },
   pwa: {
     registerType: "autoUpdate",
     manifest: {
@@ -51,7 +67,8 @@ export default defineNuxtConfig({
         { name: "apple-mobile-web-app-status-bar-style", content: "default" },
         {
           name: "viewport",
-          content: "width=device-width, initial-scale=1, viewport-fit=cover",
+          content:
+            "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
         },
       ],
       link: [

@@ -80,7 +80,9 @@ function createSafeFileName(originalName: string): string {
 export default defineEventHandler(async (event) => {
   const adminUploadKey = process.env.ADMIN_UPLOAD_KEY;
   assertAdminUploadKey(adminUploadKey);
-  assertAdminAuthorized(getHeader(event, "x-admin-key"), adminUploadKey);
+  const providedUploadKey =
+    getHeader(event, "x-admin-upload-key") ?? getHeader(event, "x-admin-key");
+  assertAdminAuthorized(providedUploadKey, adminUploadKey);
 
   const multipart = await readMultipartFormData(event);
   const filePart = multipart?.find((part) => part.name === "file");

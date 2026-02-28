@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { defineAsyncComponent } from "vue";
 import { useEmotionStyles } from "~/composables/useEmotionStyles";
-import FlowerPetals from "~/components/WebGL/FlowerPetals.vue";
 import { useWeddingStore } from "~/stores/wedding";
 
 const { appStyles } = useEmotionStyles();
 const weddingStore = useWeddingStore();
+const AsyncFlowerPetals = defineAsyncComponent(
+  () => import("~/components/WebGL/FlowerPetals.vue"),
+);
 await weddingStore.fetchWeddingData();
 </script>
 
@@ -12,7 +15,7 @@ await weddingStore.fetchWeddingData();
   <div :class="appStyles.container">
     <NuxtPwaManifest />
     <client-only>
-      <FlowerPetals />
+      <AsyncFlowerPetals />
     </client-only>
     <main :class="appStyles.contentWrapper">
       <NuxtPage />

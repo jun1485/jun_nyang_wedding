@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"C:/Program Files/Volta/pnpm.cmd\" add swiper)",
+      "Bash(cmd /c \"cd /d c:\\\\code\\\\jun_nyang_wedding && pnpm add swiper 2>&1\")",
+      "Bash(cmd /c \"pnpm --version\")",
+      "Bash(export PATH=\"/c/Program Files/Volta:$PATH\")",
+      "Read(//c/Users/joon1/**)",
+      "Bash(export VOLTA_HOME=\"/c/Users/joon1/AppData/Local/Volta\")",
+      "Bash(export PATH=\"$VOLTA_HOME/bin:$PATH\")"
+    ]
+  }
+}

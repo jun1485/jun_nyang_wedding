@@ -1,4 +1,4 @@
-import { css } from "@emotion/css";
+import { injectGlobal } from "@emotion/css";
 
 // #region 브레이크포인트
 const SM_BREAKPOINT = "640px";
@@ -6,17 +6,19 @@ const MD_BREAKPOINT = "768px";
 // #endregion
 
 // #region Emotion 라벨링
-function toKebabCase(value: string): string {
-  return value.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
-}
-
 function withEmotionLabels<T extends Record<string, string>>(
   scope: string,
   styles: T,
 ): T {
-  const entries = Object.entries(styles).map(([key, className]) => {
-    const labelClassName = `${scope}__${toKebabCase(key)}`;
-    return [key, `${labelClassName} ${className}`];
+  const entries = Object.entries(styles).map(([key, styleText]) => {
+    const labelClassName = `${scope}__${key}`;
+    // 스타일 키 기반 고정 클래스명 사용 - 브라우저/IDE 동일 명칭 탐색 용이화
+    injectGlobal`
+      .${labelClassName} {
+        ${styleText}
+      }
+    `;
+    return [key, labelClassName];
   });
 
   return Object.fromEntries(entries) as T;
@@ -25,17 +27,17 @@ function withEmotionLabels<T extends Record<string, string>>(
 
 // #region 공통 스타일
 const sharedStyles = withEmotionLabels("shared", {
-  sectionWrap: css`
+  sectionWrap: `
     width: 100%;
     max-width: 980px;
     margin: 0 auto;
-    padding: 2.75rem 1rem;
+    padding: 0.75rem 1rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       padding: 4.5rem 1.5rem;
     }
   `,
-  sectionCard: css`
+  sectionCard: `
     border-radius: 1.5rem;
     border: 1px solid rgba(231, 90, 132, 0.18);
     background: rgba(255, 255, 255, 0.76);
@@ -58,19 +60,19 @@ const sharedStyles = withEmotionLabels("shared", {
       animation: none;
     }
   `,
-  sectionTitle: css`
+  sectionTitle: `
     margin: 0;
     font-family: var(--font-main), sans-serif;
     font-weight: 700;
     letter-spacing: 0.02em;
     color: #36242f;
   `,
-  sectionSubtitle: css`
+  sectionSubtitle: `
     margin: 0;
     font-size: 0.95rem;
     color: var(--text-sub);
   `,
-  floralChip: css`
+  floralChip: `
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
@@ -83,7 +85,7 @@ const sharedStyles = withEmotionLabels("shared", {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    margin-bottom: 1.75rem;
+    margin: 1rem 0;
     animation: floral-chip-fade-in 420ms ease-out both;
 
     @keyframes floral-chip-fade-in {
@@ -102,7 +104,7 @@ const sharedStyles = withEmotionLabels("shared", {
       font-size: 0.85rem;
     }
   `,
-  petalButton: css`
+  petalButton: `
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -136,7 +138,7 @@ const sharedStyles = withEmotionLabels("shared", {
 
 // #region 앱 스타일
 const appStyles = withEmotionLabels("app", {
-  container: css`
+  container: `
     position: relative;
     min-height: 100dvh;
     overflow-x: clip;
@@ -173,7 +175,7 @@ const appStyles = withEmotionLabels("app", {
       );
     }
   `,
-  contentWrapper: css`
+  contentWrapper: `
     position: relative;
     z-index: 1;
     background-color: transparent;
@@ -183,26 +185,26 @@ const appStyles = withEmotionLabels("app", {
 
 // #region 홈 스타일
 const homeStyles = withEmotionLabels("home", {
-  root: css`
+  root: `
     color: var(--text-main);
   `,
-  heroSection: css`
+  heroSection: `
     position: relative;
     display: flex;
     min-height: 100svh;
     align-items: center;
     justify-content: center;
-    padding: 2.5rem 1rem;
+    padding: 1rem 1rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       padding: 4rem 1.5rem;
     }
   `,
-  heroInner: css`
+  heroInner: `
     width: 100%;
     max-width: 56rem;
   `,
-  heroCard: css`
+  heroCard: `
     position: relative;
     overflow: hidden;
     padding: 2rem 1.25rem;
@@ -211,7 +213,7 @@ const homeStyles = withEmotionLabels("home", {
       padding: 3rem 2.5rem;
     }
   `,
-  heroBlush: css`
+  heroBlush: `
     position: absolute;
     width: 220px;
     height: 220px;
@@ -219,7 +221,7 @@ const homeStyles = withEmotionLabels("home", {
     pointer-events: none;
     opacity: 0.75;
   `,
-  heroBlushLeft: css`
+  heroBlushLeft: `
     top: -110px;
     left: -90px;
     background: radial-gradient(
@@ -228,7 +230,7 @@ const homeStyles = withEmotionLabels("home", {
       rgba(255, 205, 219, 0) 72%
     );
   `,
-  heroBlushRight: css`
+  heroBlushRight: `
     right: -90px;
     bottom: -110px;
     background: radial-gradient(
@@ -237,17 +239,18 @@ const homeStyles = withEmotionLabels("home", {
       rgba(255, 229, 188, 0) 72%
     );
   `,
-  heroContent: css`
+  heroContent: `
     position: relative;
     z-index: 1;
     text-align: center;
   `,
-  heroTitle: css`
+  heroTitle: `
     margin: 0;
     color: #432f3a;
     line-height: 1.05;
     text-wrap: balance;
     font-size: 2.25rem;
+    font-weight: 500;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       font-size: 3rem;
@@ -257,9 +260,9 @@ const homeStyles = withEmotionLabels("home", {
       font-size: 4.5rem;
     }
   `,
-  ampersand: css`
+  ampersand: `
     display: block;
-    margin: 0 0.5rem;
+    margin: 0.4rem 0.5rem 0;
     font-size: clamp(2.2rem, 9vw, 4.3rem);
     color: #d64e75;
 
@@ -267,10 +270,10 @@ const homeStyles = withEmotionLabels("home", {
       display: inline;
     }
   `,
-  heroSubtitle: css`
+  heroSubtitle: `
     margin-top: 0.5rem;
     color: #5f4552;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       font-size: 1.875rem;
@@ -280,7 +283,7 @@ const homeStyles = withEmotionLabels("home", {
       font-size: 2.25rem;
     }
   `,
-  namesGrid: css`
+  namesGrid: `
     margin-top: 2rem;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -290,29 +293,29 @@ const homeStyles = withEmotionLabels("home", {
       gap: 1rem;
     }
   `,
-  nameCard: css`
+  nameCard: `
     border-radius: 1rem;
     border: 1px solid rgba(231, 90, 132, 0.18);
     background: rgba(255, 255, 255, 0.82);
     padding: 0.95rem 0.75rem;
   `,
-  nameValue: css`
+  nameValue: `
     margin: 0;
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: 500;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       font-size: 1.875rem;
     }
   `,
-  nameRole: css`
+  nameRole: `
     margin: 0.25rem 0 0;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
     color: #8c6d7c;
   `,
-  countdownWrap: css`
+  countdownWrap: `
     margin-top: 2rem;
     border-radius: 1rem;
     background: rgba(255, 255, 255, 0.65);
@@ -322,7 +325,7 @@ const homeStyles = withEmotionLabels("home", {
       padding: 1.25rem 1rem;
     }
   `,
-  dateCard: css`
+  dateCard: `
     margin-top: 2rem;
     border-radius: 1rem;
     border: 1px solid rgba(253, 164, 175, 0.6);
@@ -333,7 +336,7 @@ const homeStyles = withEmotionLabels("home", {
       padding: 1rem 1.5rem;
     }
   `,
-  dateText: css`
+  dateText: `
     margin: 0;
     font-size: 1rem;
     font-weight: 700;
@@ -343,7 +346,7 @@ const homeStyles = withEmotionLabels("home", {
       font-size: 1.5rem;
     }
   `,
-  venueText: css`
+  venueText: `
     margin: 0.25rem 0 0;
     font-size: 0.875rem;
     color: #7a5b68;
@@ -357,17 +360,49 @@ const homeStyles = withEmotionLabels("home", {
 
 // #region 연락처 스타일
 const contactStyles = withEmotionLabels("contact", {
-  sectionOffset: css`
+  sectionOffset: `
     padding-top: 0.5rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       padding-top: 1rem;
     }
   `,
-  header: css`
+  header: `
     text-align: center;
   `,
-  title: css`
+  floralChip: `
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.38rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(231, 90, 132, 0.25);
+    background: rgba(255, 248, 250, 0.88);
+    color: #8f4762;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.25rem;
+    animation: floral-chip-fade-in 420ms ease-out both;
+
+    @keyframes floral-chip-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    &::before {
+      content: "✿";
+      font-size: 0.85rem;
+    }
+  `,
+  title: `
     margin-top: 1rem;
     font-size: 1.875rem;
 
@@ -375,10 +410,10 @@ const contactStyles = withEmotionLabels("contact", {
       font-size: 2.25rem;
     }
   `,
-  subtitle: css`
+  subtitle: `
     margin-top: 0.5rem;
   `,
-  cardGrid: css`
+  cardGrid: `
     margin-top: 1.75rem;
     display: grid;
     gap: 1rem;
@@ -388,28 +423,28 @@ const contactStyles = withEmotionLabels("contact", {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   `,
-  cardInner: css`
+  cardInner: `
     padding: 1.25rem 1rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       padding: 1.75rem 1.5rem;
     }
   `,
-  sectionLabel: css`
+  sectionLabel: `
     margin: 0;
     color: #422f39;
     font-size: 1.2rem;
     font-weight: 700;
   `,
-  contactList: css`
+  contactList: `
     margin: 1rem 0 0;
     padding: 0;
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.35rem;
   `,
-  contactRow: css`
+  contactRow: `
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -419,13 +454,13 @@ const contactStyles = withEmotionLabels("contact", {
     border-radius: 0.9rem;
     padding: 0.75rem;
   `,
-  contactName: css`
+  contactName: `
     margin: 0;
     color: #4c3540;
     font-size: 0.95rem;
     font-weight: 700;
   `,
-  contactNumber: css`
+  contactNumber: `
     margin: 0.18rem 0 0;
     color: #7f6470;
     font-size: 0.82rem;
@@ -435,10 +470,10 @@ const contactStyles = withEmotionLabels("contact", {
 
 // #region 카운트다운 스타일
 const countdownStyles = withEmotionLabels("countdown", {
-  root: css`
+  root: `
     text-align: center;
   `,
-  calendarPaper: css`
+  calendarPaper: `
     border-radius: 0.75rem;
     margin: 0 auto 1.5rem;
     border: 1px solid rgba(199, 186, 157, 0.32);
@@ -450,12 +485,12 @@ const countdownStyles = withEmotionLabels("countdown", {
       width: min(14rem, 60vw);
     }
   `,
-  calendarHead: css`
+  calendarHead: `
     display: flex;
     align-items: flex-end;
     gap: 0.4rem;
   `,
-  calendarMonthNumber: css`
+  calendarMonthNumber: `
     margin: 0;
     color: #d64e75;
     font-family: var(--font-main), sans-serif;
@@ -464,7 +499,7 @@ const countdownStyles = withEmotionLabels("countdown", {
     font-weight: 700;
     letter-spacing: 0.02em;
   `,
-  calendarMonthLabel: css`
+  calendarMonthLabel: `
     margin: 0 0 0.18rem;
     color: #8f91ad;
     font-size: 0.62rem;
@@ -472,24 +507,25 @@ const countdownStyles = withEmotionLabels("countdown", {
     letter-spacing: 0.18em;
     text-transform: uppercase;
   `,
-  calendarGuide: css`
+  calendarGuide: `
     margin: 0.22rem 0 0.4rem;
     height: 0.92rem;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 0.31rem,
-      rgba(208, 197, 172, 0.55) 0.31rem,
-      rgba(208, 197, 172, 0.55) 0.33rem
+    background-image: linear-gradient(
+      to right,
+      rgba(208, 197, 172, 0.55),
+      rgba(208, 197, 172, 0.55)
     );
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-position: center;
   `,
-  calendarGrid: css`
+  calendarGrid: `
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     column-gap: 0.16rem;
     row-gap: 0.2rem;
   `,
-  calendarCell: css`
+  calendarCell: `
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -502,16 +538,16 @@ const countdownStyles = withEmotionLabels("countdown", {
     letter-spacing: 0.01em;
     margin: 0.2rem 0;
   `,
-  calendarCellEmpty: css`
+  calendarCellEmpty: `
     opacity: 0;
   `,
-  calendarCellSunday: css`
+  calendarCellSunday: `
     color: #b49a5e;
   `,
-  calendarCellSaturday: css`
+  calendarCellSaturday: `
     color: #7f95c4;
   `,
-  calendarCellTarget: css`
+  calendarCellTarget: `
     position: relative;
     z-index: 0;
     isolation: isolate;
@@ -536,7 +572,7 @@ const countdownStyles = withEmotionLabels("countdown", {
       transform: translate(36%, -108%) rotate(8deg);
     }
   `,
-  title: css`
+  title: `
     margin: 0;
     color: #6f5360;
     font-family: var(--font-main), sans-serif;
@@ -548,7 +584,7 @@ const countdownStyles = withEmotionLabels("countdown", {
       font-size: 1rem;
     }
   `,
-  grid: css`
+  grid: `
     margin-top: 0.75rem;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -559,20 +595,20 @@ const countdownStyles = withEmotionLabels("countdown", {
       gap: 0.75rem;
     }
   `,
-  card: css`
+  card: `
     border-radius: 0.9rem;
     border: 1px solid rgba(231, 90, 132, 0.22);
     background: rgba(255, 255, 255, 0.84);
     padding: 0.7rem 0.45rem;
   `,
-  value: css`
+  value: `
     margin: 0;
     color: #422f39;
     font-size: clamp(1.35rem, 5vw, 2.05rem);
     font-weight: 700;
     line-height: 1.1;
   `,
-  label: css`
+  label: `
     margin: 0.2rem 0 0;
     color: #8d6f7d;
     font-size: 0.72rem;
@@ -584,9 +620,9 @@ const countdownStyles = withEmotionLabels("countdown", {
 
 // #region 갤러리 스타일
 const galleryStyles = withEmotionLabels("gallery", {
-  sectionOffset: css`
+  sectionOffset: `
     && {
-      padding: 0.25rem 0 2.75rem;
+      padding: 0.25rem 0 0;
     }
 
     @media (min-width: ${SM_BREAKPOINT}) {
@@ -595,7 +631,7 @@ const galleryStyles = withEmotionLabels("gallery", {
       }
     }
   `,
-  header: css`
+  header: `
     text-align: center;
     padding-right: 1rem;
     padding-left: 1rem;
@@ -605,82 +641,287 @@ const galleryStyles = withEmotionLabels("gallery", {
       padding-left: 1.5rem;
     }
   `,
-  title: css`
-    margin-top: 1rem;
+  title: `
     font-size: 1.875rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       font-size: 2.25rem;
     }
   `,
-  subtitle: css`
+  subtitle: `
     margin-top: 0.5rem;
   `,
-  grid: css`
-    margin-top: 1.75rem;
-    display: grid;
-    padding: 1rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
+  // 캐러셀 래퍼 배경 프레임 사용
+  carouselShell: `
+    position: relative;
+    margin-top: 1.25rem;
+    padding: 0.65rem 0 2.15rem;
 
-    @media (max-width: 359px) {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0.625rem;
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0.2rem 0.75rem 1.5rem;
+      z-index: 0;
+      border-radius: 1.35rem;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 237, 243, 0.78) 0%,
+        rgba(255, 255, 255, 0.5) 54%,
+        rgba(255, 234, 217, 0.72) 100%
+      );
+      box-shadow: 0 18px 36px rgba(205, 88, 124, 0.14);
+      pointer-events: none;
+    }
+
+    @media (min-width: ${SM_BREAKPOINT}) {
+      padding: 0.85rem 0 2.25rem;
+
+      &::before {
+        inset-inline: 1.25rem;
+      }
+    }
+  `,
+  // Embla viewport 영역 고정 및 터치 제스처 충돌 최소화
+  carouselViewport: `
+    position: relative;
+    z-index: 1;
+    margin-top: 0;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 0 1.15rem 0.25rem;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    @media (min-width: ${SM_BREAKPOINT}) {
+      padding: 0 1.85rem;
+    }
+  `,
+  // Embla track 가로 정렬 및 transform 최적화 적용
+  carouselContainer: `
+    display: flex;
+    align-items: stretch;
+    gap: 0.7rem;
+  `,
+  carouselSlide: `
+    min-width: 0;
+    flex: 0 0 78%;
+    padding-bottom: 0.7rem;
+    opacity: 1;
+    transform: none;
+    filter: none;
+    scroll-snap-align: center;
+
+    @media (min-width: 360px) {
+      flex: 0 0 62%;
+    }
+
+    @media (min-width: ${SM_BREAKPOINT}) {
+      flex: 0 0 36%;
     }
 
     @media (min-width: ${MD_BREAKPOINT}) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1rem;
+      flex: 0 0 27%;
     }
   `,
-  thumbButton: css`
+  carouselDots: `
+    position: absolute;
+    bottom: 0.1rem;
+    left: 50%;
+    z-index: 2;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    padding: 0.3rem 0.45rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.55);
+  `,
+  carouselDot: `
+    width: 0.48rem;
+    height: 0.48rem;
+    border: 0;
+    border-radius: 9999px;
+    background: rgba(176, 112, 132, 0.34);
+    cursor: pointer;
+    transition:
+      width 180ms ease,
+      background-color 180ms ease;
+  `,
+  carouselDotActive: `
+    width: 1.2rem;
+    background: rgba(214, 78, 117, 0.9);
+  `,
+  carouselNavButton: `
+    position: absolute;
+    top: calc(50% - 0.35rem);
+    z-index: 2;
+    display: inline-flex;
+    width: 2.35rem;
+    height: 2.35rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.84);
+    background: linear-gradient(
+      140deg,
+      rgba(255, 255, 255, 0.95),
+      rgba(254, 236, 244, 0.92)
+    );
+    color: #8d4b63;
+    box-shadow: 0 8px 18px rgba(190, 87, 118, 0.22);
+    transform: translateY(-50%);
+    transition:
+      transform 180ms ease,
+      opacity 180ms ease,
+      box-shadow 180ms ease;
+    cursor: pointer;
+
+    &:active {
+      transform: translateY(-50%) scale(0.94);
+    }
+
+    &:disabled {
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: none;
+    }
+  `,
+  carouselNavButtonLeft: `
+    left: 0.2rem;
+
+    @media (min-width: ${SM_BREAKPOINT}) {
+      left: 0.55rem;
+    }
+  `,
+  carouselNavButtonRight: `
+    right: 0.2rem;
+
+    @media (min-width: ${SM_BREAKPOINT}) {
+      right: 0.55rem;
+    }
+  `,
+  thumbButton: `
     position: relative;
     display: block;
+    width: 100%;
+    height: 100%;
     aspect-ratio: 3 / 4;
     overflow: hidden;
     border-radius: 1rem;
     border: 0;
     padding: 0;
-    background: transparent;
+    background: #f7edf2;
     appearance: none;
     -webkit-appearance: none;
-    box-shadow: 0 4px 6px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 10px 16px rgba(26, 18, 22, 0.14);
     outline: none;
-    cursor: default;
-    transition:
-      transform 180ms ease,
-      box-shadow 180ms ease;
+    cursor: pointer;
+    transition: transform 160ms ease;
+
+    &:focus-visible {
+      box-shadow:
+        0 0 0 3px rgba(240, 109, 149, 0.35),
+        0 10px 16px rgba(26, 18, 22, 0.14);
+    }
 
     &:active {
-      transform: scale(0.985);
-      box-shadow: 0 3px 5px rgba(15, 23, 42, 0.12);
+      transform: scale(0.97);
     }
   `,
-  thumbImage: css`
+  thumbImage: `
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 240ms ease;
   `,
-  thumbCaption: css`
+  thumbImageVisible: `
+    opacity: 1;
+  `,
+  thumbImageHidden: `
+    opacity: 0;
+  `,
+  // 이미지 미로드 상태 - shimmer 스켈레톤 placeholder
+  thumbPlaceholder: `
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #f0e6ec 0%, #f8f0f4 50%, #f0e6ec 100%);
+    background-size: 200% 100%;
+    animation: gallery-skeleton-shimmer 1.5s ease-in-out infinite;
+
+    @keyframes gallery-skeleton-shimmer {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
+    }
+  `,
+  // 썸네일 네트워크 로딩 상태 표현 - 반투명 오버레이와 스피너 동시 표시
+  thumbLoadingOverlay: `
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 0.45rem;
+    background: linear-gradient(
+      180deg,
+      rgba(29, 18, 24, 0.26) 0%,
+      rgba(35, 23, 29, 0.44) 100%
+    );
+    pointer-events: none;
+  `,
+  thumbLoadingSpinner: `
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: rgba(255, 255, 255, 0.96);
+    animation: gallery-thumb-spinner-rotate 820ms linear infinite;
+
+    @keyframes gallery-thumb-spinner-rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  `,
+  thumbLoadingText: `
+    color: rgba(255, 255, 255, 0.94);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  `,
+  thumbCaption: `
     position: absolute;
     inset-inline: 0;
     bottom: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
-    padding: 0.5rem 0.75rem;
+    background: linear-gradient(to top, rgba(31, 19, 24, 0.66), transparent);
+    padding: 0.6rem 0.78rem 0.52rem;
     text-align: left;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
     color: #fff;
   `,
-  overlay: css`
+  // 라이트박스 오버레이 고정 및 스와이프 영역 클리핑 적용
+  overlay: `
     position: fixed;
     inset: 0;
     z-index: 70;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
     background: rgba(30, 16, 24, 0.95);
-    padding: 0.5rem;
     animation: gallery-overlay-fade-in 220ms ease-out both;
 
     @keyframes gallery-overlay-fade-in {
@@ -691,12 +932,62 @@ const galleryStyles = withEmotionLabels("gallery", {
         opacity: 1;
       }
     }
+  `,
+  // Embla 라이트박스 viewport/track 중앙 배치 사용
+  lightboxViewport: `
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: pan-x pan-y;
+  `,
+  lightboxContainer: `
+    display: flex;
+    height: 100%;
+    will-change: transform;
+  `,
+  lightboxSlide: `
+    min-width: 0;
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  `,
+  // 라이트박스 이미지 로딩 상태 표현 - 중앙 스피너와 안내 텍스트 고정 배치
+  lightboxLoadingOverlay: `
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 0.55rem;
+    pointer-events: none;
+  `,
+  lightboxLoadingSpinner: `
+    width: 2.15rem;
+    height: 2.15rem;
+    border-radius: 9999px;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-top-color: rgba(255, 255, 255, 0.96);
+    animation: gallery-lightbox-spinner-rotate 900ms linear infinite;
 
-    @media (min-width: ${SM_BREAKPOINT}) {
-      padding: 1rem;
+    @keyframes gallery-lightbox-spinner-rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
     }
   `,
-  closeButton: css`
+  lightboxLoadingText: `
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 0.83rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  `,
+
+  closeButton: `
     position: absolute;
     right: 0.75rem;
     top: max(0.75rem, env(safe-area-inset-top));
@@ -713,87 +1004,67 @@ const galleryStyles = withEmotionLabels("gallery", {
     backdrop-filter: blur(4px);
     cursor: pointer;
   `,
-  icon: css`
+  icon: `
     width: 1.25rem;
     height: 1.25rem;
   `,
-  stage: css`
-    position: relative;
-    display: flex;
-    width: 100%;
-    height: 100%;
-    user-select: none;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 1rem;
-    animation: gallery-stage-pop-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-
-    @keyframes gallery-stage-pop-in {
-      from {
-        opacity: 0;
-        transform: translateY(16px) scale(0.97);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-  `,
-  lightboxImage: css`
+  // 라이트박스 이미지 비율 유지 및 화면 내 중앙 배치
+  lightboxImage: `
     max-height: 84svh;
     max-width: 92vw;
     object-fit: contain;
-    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
-    transform: translateX(0) scale(1);
-    transform-origin: center center;
+    display: block;
+    backface-visibility: hidden;
     will-change: transform, opacity;
   `,
-  lightboxImageEnterNext: css`
-    animation: gallery-image-enter-next 280ms cubic-bezier(0.22, 1, 0.36, 1)
+  // 라이트박스 다음 전환 애니메이션 적용 - 우측 진입/부드러운 감속 사용
+  lightboxImageEnterNext: `
+    animation: gallery-lightbox-enter-next 320ms cubic-bezier(0.22, 1, 0.36, 1)
       both;
 
-    @keyframes gallery-image-enter-next {
+    @keyframes gallery-lightbox-enter-next {
       from {
         opacity: 0;
-        transform: translateX(30px) scale(0.985);
+        transform: translate3d(32px, 0, 0) scale(0.985);
       }
       to {
         opacity: 1;
-        transform: translateX(0) scale(1);
+        transform: translate3d(0, 0, 0) scale(1);
       }
     }
   `,
-  lightboxImageEnterPrev: css`
-    animation: gallery-image-enter-prev 280ms cubic-bezier(0.22, 1, 0.36, 1)
+  // 라이트박스 이전 전환 애니메이션 적용 - 좌측 진입/부드러운 감속 사용
+  lightboxImageEnterPrev: `
+    animation: gallery-lightbox-enter-prev 320ms cubic-bezier(0.22, 1, 0.36, 1)
       both;
 
-    @keyframes gallery-image-enter-prev {
+    @keyframes gallery-lightbox-enter-prev {
       from {
         opacity: 0;
-        transform: translateX(-30px) scale(0.985);
+        transform: translate3d(-32px, 0, 0) scale(0.985);
       }
       to {
         opacity: 1;
-        transform: translateX(0) scale(1);
+        transform: translate3d(0, 0, 0) scale(1);
       }
     }
   `,
-  navButton: css`
+  navButton: `
     position: absolute;
     top: 50%;
-    z-index: 71;
+    z-index: 72;
     display: inline-flex;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 3rem;
+    height: 3rem;
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: rgba(28, 20, 24, 0.52);
     color: #fff;
     backdrop-filter: blur(4px);
     transform: translateY(-50%);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.28);
     cursor: pointer;
     transition:
       transform 180ms ease,
@@ -802,29 +1073,35 @@ const galleryStyles = withEmotionLabels("gallery", {
 
     &:active {
       transform: translateY(-50%) scale(0.92);
-      background: rgba(255, 255, 255, 0.28);
-      border-color: rgba(255, 255, 255, 0.45);
+      background: rgba(28, 20, 24, 0.64);
+      border-color: rgba(255, 255, 255, 0.85);
+    }
+
+    &:disabled {
+      opacity: 0.24;
+      cursor: default;
+      pointer-events: none;
     }
   `,
-  navButtonLeft: css`
+  navButtonLeft: `
     left: 0.5rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       left: 1rem;
     }
   `,
-  navButtonRight: css`
+  navButtonRight: `
     right: 0.5rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       right: 1rem;
     }
   `,
-  counter: css`
+  counter: `
     position: absolute;
     left: 50%;
-    bottom: max(0.75rem, env(safe-area-inset-bottom));
-    z-index: 71;
+    bottom: calc(max(0.75rem, env(safe-area-inset-bottom)) + 3.25rem);
+    z-index: 72;
     transform: translateX(-50%);
     border-radius: 9999px;
     background: rgba(255, 255, 255, 0.15);
@@ -833,12 +1110,47 @@ const galleryStyles = withEmotionLabels("gallery", {
     color: #fff;
     backdrop-filter: blur(4px);
   `,
+  lightboxControlBar: `
+    position: absolute;
+    left: 50%;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    z-index: 72;
+    transform: translateX(-50%);
+    display: inline-flex;
+    gap: 0.5rem;
+  `,
+  lightboxControlButton: `
+    min-width: 4.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 9999px;
+    background: rgba(28, 20, 24, 0.58);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+    transition:
+      transform 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease;
+
+    &:active {
+      transform: scale(0.96);
+      background: rgba(28, 20, 24, 0.72);
+      border-color: rgba(255, 255, 255, 0.78);
+    }
+
+    &:disabled {
+      opacity: 0.24;
+      pointer-events: none;
+    }
+  `,
 } as const);
 // #endregion
 
 // #region 초대장 스타일
 const invitationStyles = withEmotionLabels("invitation", {
-  card: css`
+  card: `
     position: relative;
     overflow: hidden;
     text-align: center;
@@ -848,7 +1160,7 @@ const invitationStyles = withEmotionLabels("invitation", {
       padding: 3.5rem 3rem;
     }
   `,
-  title: css`
+  title: `
     margin-top: 1rem;
     font-size: 1.875rem;
 
@@ -856,7 +1168,7 @@ const invitationStyles = withEmotionLabels("invitation", {
       font-size: 2.25rem;
     }
   `,
-  body: css`
+  body: `
     margin-top: 1.25rem;
     color: #4f3b46;
     font-size: 0.98rem;
@@ -868,38 +1180,38 @@ const invitationStyles = withEmotionLabels("invitation", {
       line-height: 2.25rem;
     }
   `,
-  messageLine: css`
+  messageLine: `
     display: block;
   `,
-  messageLineSectionGap: css`
+  messageLineSectionGap: `
     margin-bottom: 12px;
   `,
-  namesWrap: css`
+  namesWrap: `
     margin: 2.25rem auto 0;
     max-width: 28rem;
     border-top: 1px solid rgba(253, 205, 211, 0.7);
     padding-top: 1.5rem;
   `,
-  namesRow: css`
+  namesRow: `
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    font-size: 1.125rem;
+    font-size: 1.3rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       font-size: 1.25rem;
     }
   `,
-  nameText: css`
+  nameText: `
     margin: 0;
     font-weight: 700;
   `,
-  heart: css`
+  heart: `
     margin: 0;
     color: #f43f5e;
   `,
-  deco: css`
+  deco: `
     position: absolute;
     width: 220px;
     height: 220px;
@@ -907,7 +1219,7 @@ const invitationStyles = withEmotionLabels("invitation", {
     pointer-events: none;
     opacity: 0.72;
   `,
-  decoLeft: css`
+  decoLeft: `
     top: -120px;
     left: -110px;
     background: radial-gradient(
@@ -916,7 +1228,7 @@ const invitationStyles = withEmotionLabels("invitation", {
       rgba(255, 210, 224, 0) 70%
     );
   `,
-  decoRight: css`
+  decoRight: `
     right: -110px;
     bottom: -130px;
     background: radial-gradient(
@@ -930,7 +1242,7 @@ const invitationStyles = withEmotionLabels("invitation", {
 
 // #region 배경음악 스타일
 const musicPlayerStyles = withEmotionLabels("music-player", {
-  dock: css`
+  dock: `
     position: fixed;
     right: 0.9rem;
     bottom: max(0.9rem, env(safe-area-inset-bottom));
@@ -962,7 +1274,7 @@ const musicPlayerStyles = withEmotionLabels("music-player", {
       padding-right: 0.5rem;
     }
   `,
-  button: css`
+  button: `
     display: inline-flex;
     width: 2.1rem;
     height: 2.1rem;
@@ -975,11 +1287,11 @@ const musicPlayerStyles = withEmotionLabels("music-player", {
     cursor: pointer;
     padding: 0;
   `,
-  icon: css`
+  icon: `
     width: 1rem;
     height: 1rem;
   `,
-  volume: css`
+  volume: `
     width: 3.8rem;
     height: 0.25rem;
     appearance: none;
@@ -1011,7 +1323,7 @@ const musicPlayerStyles = withEmotionLabels("music-player", {
       cursor: pointer;
     }
   `,
-  label: css`
+  label: `
     color: #8c5a70;
     font-size: 0.95rem;
     font-weight: 700;
@@ -1023,29 +1335,60 @@ const musicPlayerStyles = withEmotionLabels("music-player", {
 
 // #region 예식장 스타일
 const venueStyles = withEmotionLabels("venue", {
-  card: css`
-    padding: 2rem 1.25rem;
+  card: `
+    padding: 1rem 1.25rem 1rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       padding: 2.75rem 2.5rem;
     }
   `,
-  header: css`
+  header: `
     text-align: center;
   `,
-  title: css`
-    margin-top: 1rem;
+  floralChip: `
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.38rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(231, 90, 132, 0.25);
+    background: rgba(255, 248, 250, 0.88);
+    color: #8f4762;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+    animation: floral-chip-fade-in 420ms ease-out both;
+
+    @keyframes floral-chip-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    &::before {
+      content: "✿";
+      font-size: 0.85rem;
+    }
+  `,
+  title: `
     font-size: 1.875rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       font-size: 2.25rem;
     }
   `,
-  venueInfo: css`
+  venueInfo: `
     margin-top: 1.5rem;
     text-align: center;
   `,
-  venueName: css`
+  venueName: `
     margin: 0;
     font-size: 1.125rem;
     font-weight: 700;
@@ -1054,7 +1397,7 @@ const venueStyles = withEmotionLabels("venue", {
       font-size: 1.5rem;
     }
   `,
-  venueAddress: css`
+  venueAddress: `
     margin: 0.5rem 0 0;
     font-size: 0.875rem;
     color: #71535f;
@@ -1063,7 +1406,7 @@ const venueStyles = withEmotionLabels("venue", {
       font-size: 1rem;
     }
   `,
-  mapWrap: css`
+  mapWrap: `
     position: relative;
     margin-top: 1.5rem;
     overflow: hidden;
@@ -1072,7 +1415,7 @@ const venueStyles = withEmotionLabels("venue", {
     background: rgba(255, 255, 255, 0.75);
     box-shadow: 0 10px 16px rgba(15, 23, 42, 0.12);
   `,
-  mapFrame: css`
+  mapFrame: `
     width: 100%;
     height: 300px;
     border: 0;
@@ -1081,7 +1424,7 @@ const venueStyles = withEmotionLabels("venue", {
       height: 320px;
     }
   `,
-  mapChipWrap: css`
+  mapChipWrap: `
     position: absolute;
     right: 0.75rem;
     bottom: 0.75rem;
@@ -1090,7 +1433,7 @@ const venueStyles = withEmotionLabels("venue", {
     flex-wrap: wrap;
     gap: 0.5rem;
   `,
-  mapChip: css`
+  mapChip: `
     border-radius: 9999px;
     border: 1px solid rgba(255, 255, 255, 0.7);
     background-color: rgba(255, 255, 255, 0.92);
@@ -1100,10 +1443,10 @@ const venueStyles = withEmotionLabels("venue", {
     text-decoration: none;
     padding: 0.42rem 0.7rem;
   `,
-  transportSection: css`
+  transportSection: `
     margin-top: 1.75rem;
   `,
-  transportTitle: css`
+  transportTitle: `
     margin: 0;
     font-size: 1.125rem;
     font-weight: 700;
@@ -1113,7 +1456,7 @@ const venueStyles = withEmotionLabels("venue", {
       font-size: 1.25rem;
     }
   `,
-  transportGrid: css`
+  transportGrid: `
     margin-top: 0.75rem;
     display: grid;
     gap: 0.5rem;
@@ -1122,25 +1465,25 @@ const venueStyles = withEmotionLabels("venue", {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   `,
-  transportCard: css`
+  transportCard: `
     border-radius: 0.75rem;
     border: 1px solid rgba(255, 228, 230, 1);
     background: rgba(255, 241, 242, 0.7);
     padding: 0.75rem;
   `,
-  transportType: css`
+  transportType: `
     margin: 0;
     font-size: 0.875rem;
     font-weight: 700;
     color: #5f4552;
   `,
-  transportDetails: css`
+  transportDetails: `
     margin: 0.25rem 0 0;
     font-size: 0.875rem;
     color: #6f5864;
     white-space: pre-line;
   `,
-  actionRow: css`
+  actionRow: `
     margin-top: 1.75rem;
     display: flex;
     flex-wrap: wrap;
@@ -1151,12 +1494,27 @@ const venueStyles = withEmotionLabels("venue", {
       gap: 0.75rem;
     }
   `,
+  // 예식장 action 버튼 가독성 보정 및 모바일 터치 영역 확장 적용
+  actionButton: `
+    min-width: 8.5rem;
+    min-height: 2.8rem;
+    font-size: 0.98rem;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    padding: 0.8rem 1.25rem;
+    white-space: nowrap;
+
+    @media (min-width: ${SM_BREAKPOINT}) {
+      min-width: 9rem;
+      font-size: 1rem;
+    }
+  `,
 } as const);
 // #endregion
 
 // #region 꽃잎 캔버스 스타일
 const flowerPetalStyles = withEmotionLabels("flower-petal", {
-  canvas: css`
+  canvas: `
     position: fixed;
     inset: 0;
     width: 100%;
@@ -1184,3 +1542,4 @@ export function useEmotionStyles() {
   };
 }
 // #endregion
+

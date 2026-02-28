@@ -114,25 +114,29 @@ async function fetchBlobItems(): Promise<ListBlobResultBlob[]> {
 }
 
 export default defineEventHandler(async (event): Promise<GalleryItem[]> => {
+  try {
+    const items = await fetchBlobItems();
+    if (items.length > 0) {
+      return items
+        .sort((a, b) =>
+          GALLERY_ORDER_COLLATOR.compare(
+            createItemKey(a.pathname),
+            createItemKey(b.pathname),
+          ),
+        )
+        .map((item) => ({
+          src: item.url,
+          alt: createAltText(item.pathname),
+        }));
+    }
+  } catch {
+    // Blob 조회 실패 시 로컬 갤러리 fallback 경로 유지
+  }
+
   const localGallery = await fetchLocalItems(event);
   if (localGallery.items.length > 0) {
     return sortGalleryItems(localGallery.items, localGallery.orderKeys);
   }
 
-  try {
-    const items = await fetchBlobItems();
-    return items
-      .sort((a, b) =>
-        GALLERY_ORDER_COLLATOR.compare(
-          createItemKey(a.pathname),
-          createItemKey(b.pathname),
-        ),
-      )
-      .map((item) => ({
-        src: item.url,
-        alt: createAltText(item.pathname),
-      }));
-  } catch {
-    return [];
-  }
+  return [];
 });
