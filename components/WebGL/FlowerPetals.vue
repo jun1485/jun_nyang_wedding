@@ -4,20 +4,40 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import * as THREE from "three";
+import {
+  DoubleSide,
+  Mesh,
+  MeshBasicMaterial,
+  OrthographicCamera,
+  PlaneGeometry,
+  Scene,
+  Texture,
+  TextureLoader,
+  WebGLRenderer,
+} from "three";
 import { useEmotionStyles } from "~/composables/useEmotionStyles";
+
+interface PetalUserData {
+  speed: number;
+  rotationSpeedX: number;
+  rotationSpeedY: number;
+  sway: number;
+}
+
+type PetalMesh = Mesh<PlaneGeometry, MeshBasicMaterial>;
 
 const canvas = ref<HTMLCanvasElement | null>(null);
 const { flowerPetalStyles } = useEmotionStyles();
 
-let renderer: THREE.WebGLRenderer | null = null;
-let scene: THREE.Scene | null = null;
-let camera: THREE.OrthographicCamera | null = null;
-let petals: THREE.Mesh[] = [];
+let renderer: WebGLRenderer | null = null;
+let scene: Scene | null = null;
+let camera: OrthographicCamera | null = null;
+let petals: PetalMesh[] = [];
 let animationFrameId: number | null = null;
-let sharedGeometry: THREE.PlaneGeometry | null = null;
-let sharedMaterial: THREE.MeshBasicMaterial | null = null;
-let sharedTexture: THREE.Texture | null = null;
+let sharedGeometry: PlaneGeometry | null = null;
+let sharedMaterial: MeshBasicMaterial | null = null;
+let sharedTexture: Texture | null = null;
+let currentAspect = 1;
 
 // SSR 안전성: 브라우저 전역(window/navigator)은 클라이언트에서만 접근
 const isClient = typeof window !== "undefined";
@@ -54,25 +74,27 @@ let visibilityHandler: (() => void) | null = null;
 const createPetals = () => {
   if (!scene) return;
 
-  const textureLoader = new THREE.TextureLoader();
+  const textureLoader = new TextureLoader();
   sharedTexture = textureLoader.load("/textures/petal.svg");
 
-  sharedGeometry = new THREE.PlaneGeometry(0.2, 0.2);
-  sharedMaterial = new THREE.MeshBasicMaterial({
+  sharedGeometry = new PlaneGeometry(0.2, 0.2);
+  sharedMaterial = new MeshBasicMaterial({
     map: sharedTexture,
-    side: THREE.DoubleSide,
+    side: DoubleSide,
     transparent: true,
     alphaTest: 0.1,
   });
+
+  const spawnWidth = FRUSTUM_HEIGHT * currentAspect;
 
   for (let i = 0; i < PETAL_COUNT; i++) {
     const material = sharedMaterial.clone();
     material.opacity = Math.random() * 0.5 + 0.4;
 
-    const petal = new THREE.Mesh(sharedGeometry, material);
+    const petal = new Mesh(sharedGeometry, material);
 
     petal.position.set(
-      (Math.random() - 0.5) * 10,
+      (Math.random() - 0.5) * spawnWidth,
       Math.random() * FRUSTUM_HEIGHT - FRUSTUM_HEIGHT / 2,
       0
     );
@@ -80,12 +102,13 @@ const createPetals = () => {
     const scale = Math.random() * 0.5 + 0.5;
     petal.scale.set(scale, scale, scale);
 
-    petal.userData.speed = prefersReducedMotion
+    const userData = petal.userData as PetalUserData;
+    userData.speed = prefersReducedMotion
       ? Math.random() * 0.002 + 0.001
       : Math.random() * (isMobile ? 0.0045 : 0.006) + 0.002;
-    petal.userData.rotationSpeedX = (Math.random() - 0.5) * 0.015;
-    petal.userData.rotationSpeedY = (Math.random() - 0.5) * 0.015;
-    petal.userData.sway = Math.random() * Math.PI;
+    userData.rotationSpeedX = (Math.random() - 0.5) * 0.015;
+    userData.rotationSpeedY = (Math.random() - 0.5) * 0.015;
+    userData.sway = Math.random() * Math.PI;
 
     petals.push(petal);
     scene.add(petal);
@@ -99,25 +122,20 @@ const animate = () => {
   if (!renderer || !scene || !camera) return;
 
   if (!isPaused) {
-    const aspect = window.innerWidth / window.innerHeight;
-
     petals.forEach((petal) => {
-      const speed = Number(petal.userData.speed ?? 0.003);
-      const sway = Number(petal.userData.sway ?? 0);
-      const rotationSpeedX = Number(petal.userData.rotationSpeedX ?? 0);
-      const rotationSpeedY = Number(petal.userData.rotationSpeedY ?? 0);
+      const userData = petal.userData as PetalUserData;
 
-      petal.position.y -= speed;
+      petal.position.y -= userData.speed;
 
-      petal.userData.sway = sway + speed * 0.4;
-      petal.position.x += Math.sin(Number(petal.userData.sway)) * 0.002;
+      userData.sway += userData.speed * 0.4;
+      petal.position.x += Math.sin(userData.sway) * 0.002;
 
-      petal.rotation.x += rotationSpeedX;
-      petal.rotation.y += rotationSpeedY;
+      petal.rotation.x += userData.rotationSpeedX;
+      petal.rotation.y += userData.rotationSpeedY;
 
       if (petal.position.y < -FRUSTUM_HEIGHT / 2 - 0.1) {
         petal.position.y = FRUSTUM_HEIGHT / 2 + 0.1;
-        petal.position.x = (Math.random() - 0.5) * FRUSTUM_HEIGHT * aspect;
+        petal.position.x = (Math.random() - 0.5) * FRUSTUM_HEIGHT * currentAspect;
       }
     });
 
@@ -135,12 +153,12 @@ const handleResize = () => {
 
   const width = window.innerWidth;
   const height = window.innerHeight;
-  const aspect = width / height;
+  currentAspect = width / height;
 
   renderer.setSize(width, height, false);
 
-  camera.left = (-FRUSTUM_HEIGHT * aspect) / 2;
-  camera.right = (FRUSTUM_HEIGHT * aspect) / 2;
+  camera.left = (-FRUSTUM_HEIGHT * currentAspect) / 2;
+  camera.right = (FRUSTUM_HEIGHT * currentAspect) / 2;
   camera.top = FRUSTUM_HEIGHT / 2;
   camera.bottom = -FRUSTUM_HEIGHT / 2;
   camera.updateProjectionMatrix();
@@ -150,13 +168,13 @@ onMounted(() => {
   if (!canvas.value) return;
 
   // Scene
-  scene = new THREE.Scene();
+  scene = new Scene();
 
   // Camera
-  const aspect = window.innerWidth / window.innerHeight;
-  camera = new THREE.OrthographicCamera(
-    (-FRUSTUM_HEIGHT * aspect) / 2,
-    (FRUSTUM_HEIGHT * aspect) / 2,
+  currentAspect = window.innerWidth / window.innerHeight;
+  camera = new OrthographicCamera(
+    (-FRUSTUM_HEIGHT * currentAspect) / 2,
+    (FRUSTUM_HEIGHT * currentAspect) / 2,
     FRUSTUM_HEIGHT / 2,
     -FRUSTUM_HEIGHT / 2,
     0.1,
@@ -165,7 +183,7 @@ onMounted(() => {
   camera.position.z = 5;
 
   // Renderer
-  renderer = new THREE.WebGLRenderer({
+  renderer = new WebGLRenderer({
     canvas: canvas.value,
     antialias: !isMobile,
     alpha: true,
@@ -196,11 +214,7 @@ onUnmounted(() => {
 
   if (scene) {
     petals.forEach((petal) => {
-      if (Array.isArray(petal.material)) {
-        petal.material.forEach((m) => m.dispose());
-      } else {
-        petal.material.dispose();
-      }
+      petal.material.dispose();
       scene?.remove(petal);
     });
   }

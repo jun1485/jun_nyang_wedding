@@ -2,7 +2,7 @@
   <section :class="sharedStyles.sectionWrap">
     <div :class="[sharedStyles.sectionCard, venueStyles.card]">
       <div :class="venueStyles.header">
-        <span :class="sharedStyles.floralChip">Venue</span>
+        <span :class="venueStyles.floralChip">Venue</span>
         <h2 :class="[sharedStyles.sectionTitle, venueStyles.title]">오시는 길</h2>
       </div>
 
@@ -59,8 +59,14 @@
       </div>
 
       <div :class="venueStyles.actionRow">
-        <a :href="calendarIcsUri" :class="sharedStyles.petalButton">캘린더 추가</a>
-        <button type="button" :class="sharedStyles.petalButton" @click="shareInvitation">
+        <a :href="calendarIcsUri" :class="[sharedStyles.petalButton, venueStyles.actionButton]"
+          >캘린더 추가</a
+        >
+        <button
+          type="button"
+          :class="[sharedStyles.petalButton, venueStyles.actionButton]"
+          @click="shareInvitation"
+        >
           청첩장 공유
         </button>
       </div>

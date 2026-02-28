@@ -1,7 +1,7 @@
 <template>
   <section :class="[sharedStyles.sectionWrap, contactStyles.sectionOffset]">
     <div :class="contactStyles.header">
-      <span :class="sharedStyles.floralChip">Contact</span>
+      <span :class="contactStyles.floralChip">Contact</span>
       <h2 :class="[sharedStyles.sectionTitle, contactStyles.title]">마음 전하실 곳</h2>
       <p :class="[sharedStyles.sectionSubtitle, contactStyles.subtitle]">은행명과 계좌번호를 확인해 주세요</p>
     </div>

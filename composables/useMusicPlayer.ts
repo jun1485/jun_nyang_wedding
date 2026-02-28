@@ -21,6 +21,7 @@ export function useMusicPlayer() {
   let unmuteOnUserGesture: (() => void) | null = null;
   let visibilityChangeHandler: (() => void) | null = null;
   let pageHideHandler: (() => void) | null = null;
+  let windowBlurHandler: (() => void) | null = null;
   // #endregion
 
   // #region 사용자 제스처 이벤트
@@ -55,6 +56,13 @@ export function useMusicPlayer() {
   }
   // #endregion
 
+  // #region 재생 가능 상태 판별
+  // 백그라운드 재생 차단 규칙 통일 - hidden 상태에서 재생 시도 조기 중단 사용
+  function isHiddenState(): boolean {
+    return document.visibilityState === "hidden";
+  }
+  // #endregion
+
   // #region 볼륨 제어
   /** 볼륨 변경 - audio 요소와 상태 동기화 */
   function setVolume(newVolume: number) {
@@ -82,6 +90,7 @@ export function useMusicPlayer() {
   /** 자동재생 정책 차단 시 사용자 제스처에서 재생 복원 */
   async function resumePlayback() {
     if (!audioPlayer.value) return;
+    if (isHiddenState()) return;
     try {
       audioPlayer.value.muted = false;
       audioPlayer.value.volume = volume.value;
@@ -96,6 +105,7 @@ export function useMusicPlayer() {
   /** 자동재생 시도 - 정책 차단 시 muted 재생 → 제스처 대기 순서로 fallback */
   async function tryAutoplay() {
     if (!audioPlayer.value) return;
+    if (isHiddenState()) return;
     const el = audioPlayer.value;
     el.volume = volume.value;
 
@@ -136,7 +146,7 @@ export function useMusicPlayer() {
     currentIndex.value = (currentIndex.value + 1) % PLAYLIST.length;
     audioPlayer.value.src = currentSrc.value;
     audioPlayer.value.load();
-    if (isPlaying.value) {
+    if (isPlaying.value && !isHiddenState()) {
       audioPlayer.value.play().catch(() => {});
     }
   }
@@ -144,6 +154,7 @@ export function useMusicPlayer() {
   /** 재생/일시정지 토글 */
   function togglePlay() {
     if (!audioPlayer.value) return;
+    if (!isPlaying.value && isHiddenState()) return;
     if (isPlaying.value) {
       audioPlayer.value.pause();
       isPlaying.value = false;
@@ -186,9 +197,13 @@ export function useMusicPlayer() {
     pageHideHandler = () => {
       pauseOnHiddenState();
     };
+    windowBlurHandler = () => {
+      pauseOnHiddenState();
+    };
 
     document.addEventListener("visibilitychange", visibilityChangeHandler);
     window.addEventListener("pagehide", pageHideHandler);
+    window.addEventListener("blur", windowBlurHandler);
   });
 
   onUnmounted(() => {
@@ -206,6 +221,10 @@ export function useMusicPlayer() {
 
     if (pageHideHandler) {
       window.removeEventListener("pagehide", pageHideHandler);
+    }
+
+    if (windowBlurHandler) {
+      window.removeEventListener("blur", windowBlurHandler);
     }
   });
   // #endregion

@@ -55,10 +55,10 @@
       </div>
     </section>
 
-    <Invitation />
-    <Gallery />
-    <Venue />
-    <Contact />
+    <LazyInvitation />
+    <LazyGallery />
+    <LazyVenue />
+    <LazyContact />
   </div>
 </template>
 
