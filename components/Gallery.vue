@@ -74,7 +74,7 @@
                     : galleryStyles.thumbImageHidden,
                 ]"
                 @load="markThumbLoaded(index)"
-                @error="markThumbLoaded(index)"
+                @error="markThumbError(index)"
               />
               <div v-if="!isThumbReady(index)" :class="galleryStyles.thumbPlaceholder" />
               <div v-else-if="!isThumbLoaded(index)" :class="galleryStyles.thumbLoadingOverlay">
@@ -87,23 +87,90 @@
         </div>
       </div>
 
-      <div
-        v-if="thumbSnapIndexes.length > 1"
-        :class="galleryStyles.carouselDots"
+    </div>
+
+    <div :class="galleryStyles.viewAllButtonWrap">
+      <button
+        type="button"
+        :class="galleryStyles.viewAllButton"
+        :disabled="totalImages === 0"
+        @click="openAllPhotosLayer"
       >
-        <button
-          v-for="snapIndex in thumbSnapIndexes"
-          :key="`gallery-dot-${snapIndex}`"
-          type="button"
-          :class="[
-            galleryStyles.carouselDot,
-            thumbSelectedSnapIndex === snapIndex
-              ? galleryStyles.carouselDotActive
-              : '',
-          ]"
-          :aria-label="`${snapIndex + 1}번째 그룹으로 이동`"
-          @click="scrollThumbTo(snapIndex)"
-        />
+        사진 전체보기
+      </button>
+    </div>
+
+    <div
+      v-if="isAllPhotosLayerOpen"
+      :class="galleryStyles.allPhotosLayer"
+      @click.self="closeAllPhotosLayer"
+    >
+      <div :class="galleryStyles.allPhotosPanel">
+        <div :class="galleryStyles.allPhotosHeader">
+          <h3 :class="galleryStyles.allPhotosTitle">사진 전체보기</h3>
+          <button
+            type="button"
+            :class="galleryStyles.allPhotosCloseButton"
+            aria-label="사진 전체보기 닫기"
+            @click="closeAllPhotosLayer"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              :class="galleryStyles.icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div
+          :class="galleryStyles.allPhotosBody"
+        >
+          <div :class="galleryStyles.allPhotosGrid">
+            <button
+              v-for="(image, index) in allPhotosVisibleImages"
+              :key="`gallery-all-${image.src}-${index}`"
+              type="button"
+              :class="galleryStyles.allPhotosItemButton"
+              @click="openLightboxFromAllPhotos(index, image.src)"
+            >
+              <div :class="galleryStyles.allPhotosMedia">
+                <img
+                  :ref="(el) => registerAllPhotosImage(el, image.src)"
+                  :src="image.src"
+                  :alt="image.alt"
+                  decoding="async"
+                  :class="[
+                    galleryStyles.allPhotosImage,
+                    isAllPhotosImageLoaded(image.src)
+                      ? galleryStyles.allPhotosImageVisible
+                      : galleryStyles.allPhotosImageHidden,
+                  ]"
+                  @load="markAllPhotosImageLoaded(image.src)"
+                  @error="markAllPhotosImageError(image.src)"
+                />
+                <div
+                  v-if="!isAllPhotosImageLoaded(image.src)"
+                  :class="galleryStyles.allPhotosSkeleton"
+                />
+                <div
+                  v-if="!isAllPhotosImageLoaded(image.src)"
+                  :class="galleryStyles.allPhotosLoadingOverlay"
+                >
+                  <span :class="galleryStyles.allPhotosLoadingSpinner" />
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -147,6 +214,7 @@
               :key="currentLightboxImageKey"
               :src="currentLightboxImage.src"
               :alt="currentLightboxImage.alt"
+              decoding="async"
               :class="[galleryStyles.lightboxImage, currentLightboxMotionClass]"
               @load="onLightboxImageLoad"
               @error="onLightboxImageLoad"
@@ -238,8 +306,15 @@ const {
   isThumbReady,
   isThumbLoaded,
   markThumbLoaded,
+  markThumbError,
+  markAllPhotosImageLoaded,
+  markAllPhotosImageError,
+  registerAllPhotosImage,
+  isAllPhotosImageLoaded,
   registerThumb,
+  allPhotosVisibleImages,
   totalImages,
+  isAllPhotosLayerOpen,
   isLightboxOpen,
   currentLightboxIndex,
   currentLightboxImage,
@@ -251,14 +326,14 @@ const {
   isThumbBeginning,
   isThumbEnd,
   showThumbNavigation,
-  thumbSelectedSnapIndex,
-  thumbSnapIndexes,
   thumbViewportRef,
   openLightbox,
+  openAllPhotosLayer,
+  closeAllPhotosLayer,
+  openLightboxFromAllPhotos,
   closeLightbox,
   scrollThumbPrev,
   scrollThumbNext,
-  scrollThumbTo,
   slidePrev,
   slideNext,
   onLightboxImageLoad,

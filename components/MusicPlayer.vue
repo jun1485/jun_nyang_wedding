@@ -78,6 +78,7 @@
     <audio
       ref="audioPlayer"
       :src="currentSrc"
+      :muted="isMuted"
       preload="metadata"
       autoplay
       playsinline
