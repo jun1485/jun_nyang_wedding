@@ -827,7 +827,11 @@ const galleryStyles = withEmotionLabels("gallery", {
     aspect-ratio: 3 / 4;
     background: #e9e2e7;
   `,
+  // img GPU eviction 대비 - skeleton 위 z-index 2에 배치, 항상 DOM에 유지되는 skeleton이 blank 시 배경 역할
   allPhotosImage: `
+    position: absolute;
+    inset: 0;
+    z-index: 2;
     display: block;
     width: 100%;
     height: 100%;
@@ -841,6 +845,7 @@ const galleryStyles = withEmotionLabels("gallery", {
   allPhotosImageHidden: `
     opacity: 0;
   `,
+  // 로드 전: shimmer 애니메이션 / 로드 후: 정적 배경으로 전환 - img blank 시 회색 배경 노출
   allPhotosSkeleton: `
     position: absolute;
     inset: 0;
@@ -858,10 +863,14 @@ const galleryStyles = withEmotionLabels("gallery", {
       }
     }
   `,
+  allPhotosSkeletonDone: `
+    animation: none;
+    background: #dbd3d9;
+  `,
   allPhotosLoadingOverlay: `
     position: absolute;
     inset: 0;
-    z-index: 2;
+    z-index: 3;
     display: grid;
     place-items: center;
     background: linear-gradient(

@@ -147,7 +147,7 @@
                   :ref="(el) => registerAllPhotosImage(el, image.src)"
                   :src="image.src"
                   :alt="image.alt"
-                  decoding="async"
+                  decoding="auto"
                   :class="[
                     galleryStyles.allPhotosImage,
                     isAllPhotosImageLoaded(image.src)
@@ -158,8 +158,10 @@
                   @error="markAllPhotosImageError(image.src)"
                 />
                 <div
-                  v-if="!isAllPhotosImageLoaded(image.src)"
-                  :class="galleryStyles.allPhotosSkeleton"
+                  :class="[
+                    galleryStyles.allPhotosSkeleton,
+                    isAllPhotosImageLoaded(image.src) ? galleryStyles.allPhotosSkeletonDone : '',
+                  ]"
                 />
                 <div
                   v-if="!isAllPhotosImageLoaded(image.src)"
