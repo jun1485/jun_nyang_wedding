@@ -78,7 +78,8 @@
     <audio
       ref="audioPlayer"
       :src="currentSrc"
-      :muted="isMuted"
+      :muted="audioMuted"
+      :defaultMuted="audioMuted"
       preload="metadata"
       autoplay
       playsinline
@@ -96,6 +97,7 @@ import { useMusicPlayer } from "~/composables/useMusicPlayer";
 const { musicPlayerStyles } = useEmotionStyles();
 const {
   audioPlayer,
+  audioMuted,
   isPlaying,
   isMuted,
   volume,

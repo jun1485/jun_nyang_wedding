@@ -147,7 +147,9 @@
                   :ref="(el) => registerAllPhotosImage(el, image.src)"
                   :src="image.src"
                   :alt="image.alt"
-                  decoding="auto"
+                  loading="lazy"
+                  fetchpriority="low"
+                  decoding="sync"
                   :class="[
                     galleryStyles.allPhotosImage,
                     isAllPhotosImageLoaded(image.src)

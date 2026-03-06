@@ -21,7 +21,8 @@ export default defineNuxtConfig({
     },
   },
   pwa: {
-    registerType: "autoUpdate",
+    // 서비스워커 활성화 즉시 강제 리로드 차단, 사용자 상호작용 중 화면 재시작 오인 방지 목적의 수동 갱신 대기 사용
+    registerType: "prompt",
     manifest: {
       id: "/",
       name: "주정준 ♥ 이인영 모바일 청첩장",

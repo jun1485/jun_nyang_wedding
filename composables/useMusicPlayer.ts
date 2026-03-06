@@ -18,7 +18,9 @@ export function useMusicPlayer() {
   // #region 상태
   const audioPlayer = ref<HTMLAudioElement | null>(null);
   const isPlaying = ref(false);
-  const isMuted = ref(false);
+  const shouldBootMuted = ref(resolvePreferMutedAutoplay());
+  const isMuted = ref(shouldBootMuted.value);
+  const audioMuted = computed(() => shouldBootMuted.value || isMuted.value);
   const volume = ref(INITIAL_VOLUME);
   const currentIndex = ref(0);
   const autoplayIntent = ref(true);
@@ -118,8 +120,18 @@ export function useMusicPlayer() {
     return document.visibilityState === "hidden";
   }
 
+  function isMobileAutoplayUserAgent(userAgent: string): boolean {
+    return /iphone|ipad|ipod|android/i.test(userAgent);
+  }
+
   function resolvePreferMutedAutoplay(): boolean {
-    return /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+    if (import.meta.server) {
+      const requestHeaders = useRequestHeaders(["user-agent"]);
+      return isMobileAutoplayUserAgent(requestHeaders["user-agent"] ?? "");
+    }
+
+    if (typeof navigator === "undefined") return false;
+    return isMobileAutoplayUserAgent(navigator.userAgent);
   }
 
   function clearAutoplayRetryTimer() {
@@ -135,6 +147,26 @@ export function useMusicPlayer() {
   // #endregion
 
   // #region 볼륨 제어
+  // audio muted/defaultMuted 속성 동기화 - 모바일 초기 음소거 자동재생 유지 및 사용자 해제 상태 보존 사용
+  function syncMutedState(nextMuted: boolean) {
+    isMuted.value = nextMuted;
+
+    if (!nextMuted) {
+      shouldBootMuted.value = false;
+    }
+
+    if (!audioPlayer.value) return;
+    audioPlayer.value.muted = nextMuted;
+    audioPlayer.value.defaultMuted = nextMuted;
+
+    if (nextMuted) {
+      audioPlayer.value.setAttribute("muted", "");
+      return;
+    }
+
+    audioPlayer.value.removeAttribute("muted");
+  }
+
   /** 볼륨 변경 - audio 요소와 상태 동기화 */
   function setVolume(newVolume: number) {
     volume.value = Math.max(0, Math.min(1, newVolume));
@@ -142,19 +174,16 @@ export function useMusicPlayer() {
     if (!audioPlayer.value) return;
     audioPlayer.value.volume = volume.value;
     if (volume.value === 0) {
-      isMuted.value = true;
-      audioPlayer.value.muted = true;
+      syncMutedState(true);
     } else if (isMuted.value) {
-      isMuted.value = false;
-      audioPlayer.value.muted = false;
+      syncMutedState(false);
     }
   }
 
   /** 음소거 토글 - mute 시 볼륨 아이콘 반영 */
   function toggleMute() {
     if (!audioPlayer.value) return;
-    audioPlayer.value.muted = !audioPlayer.value.muted;
-    isMuted.value = audioPlayer.value.muted;
+    syncMutedState(!audioPlayer.value.muted);
   }
   // #endregion
 
@@ -164,14 +193,11 @@ export function useMusicPlayer() {
     if (!audioPlayer.value) return;
     if (isHiddenState()) return;
     try {
-      audioPlayer.value.muted = false;
-      audioPlayer.value.defaultMuted = false;
-      audioPlayer.value.removeAttribute("muted");
+      syncMutedState(false);
       audioPlayer.value.volume = volume.value;
       await audioPlayer.value.play();
       persistAutoplayIntent(true);
       isPlaying.value = true;
-      isMuted.value = false;
       if (resumeOnUserGesture) {
         removeUserGestureListeners(resumeOnUserGesture);
         resumeOnUserGesture = null;
@@ -187,19 +213,11 @@ export function useMusicPlayer() {
     if (isHiddenState()) return false;
 
     const el = audioPlayer.value;
-    el.muted = muted;
-    el.defaultMuted = muted;
-
-    if (muted) {
-      el.setAttribute("muted", "");
-    } else {
-      el.removeAttribute("muted");
-    }
+    syncMutedState(muted);
 
     try {
       await el.play();
       isPlaying.value = true;
-      isMuted.value = muted;
       persistAutoplayIntent(true);
       if (resumeOnUserGesture) {
         removeUserGestureListeners(resumeOnUserGesture);
@@ -215,11 +233,8 @@ export function useMusicPlayer() {
   function attachUnmuteOnGesture() {
     const unmute = () => {
       if (!audioPlayer.value) return;
-      audioPlayer.value.muted = false;
-      audioPlayer.value.defaultMuted = false;
-      audioPlayer.value.removeAttribute("muted");
+      syncMutedState(false);
       audioPlayer.value.volume = volume.value;
-      isMuted.value = false;
       unmuteOnUserGesture = null;
     };
 
@@ -338,10 +353,7 @@ export function useMusicPlayer() {
     if (audioPlayer.value) {
       // 모바일 자동재생 정책 대응 - 초기 muted/defaultMuted 상태 선적용 후 재생 시도 사용
       if (preferMutedAutoplay && autoplayIntent.value) {
-        audioPlayer.value.muted = true;
-        audioPlayer.value.defaultMuted = true;
-        audioPlayer.value.setAttribute("muted", "");
-        isMuted.value = true;
+        syncMutedState(true);
       }
 
       audioPlayer.value.volume = volume.value;
@@ -406,6 +418,7 @@ export function useMusicPlayer() {
 
   return {
     audioPlayer,
+    audioMuted,
     isPlaying,
     isMuted,
     volume,

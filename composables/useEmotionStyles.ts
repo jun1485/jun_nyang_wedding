@@ -183,6 +183,87 @@ const appStyles = withEmotionLabels("app", {
 } as const);
 // #endregion
 
+// #region PWA 업데이트 배너 스타일
+const pwaNoticeStyles = withEmotionLabels("pwa-notice", {
+  wrap: `
+    position: fixed;
+    right: 1rem;
+    bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 1rem);
+    left: 1rem;
+    z-index: 85;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+
+    @media (min-width: ${SM_BREAKPOINT}) {
+      left: auto;
+      max-width: 24rem;
+    }
+  `,
+  panel: `
+    width: 100%;
+    border: 1px solid rgba(226, 194, 204, 0.9);
+    border-radius: 1.15rem;
+    background: rgba(255, 248, 247, 0.96);
+    box-shadow: 0 18px 36px rgba(122, 76, 95, 0.16);
+    backdrop-filter: blur(10px);
+    padding: 1rem 1rem 0.95rem;
+    pointer-events: auto;
+  `,
+  title: `
+    margin: 0;
+    color: #4e3944;
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  `,
+  description: `
+    margin: 0.35rem 0 0;
+    color: #745966;
+    font-size: 0.84rem;
+    line-height: 1.45;
+  `,
+  actionRow: `
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    margin-top: 0.85rem;
+  `,
+  button: `
+    min-width: 6.5rem;
+    min-height: 2.5rem;
+    border-radius: 9999px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 0.6rem 0.95rem;
+    cursor: pointer;
+    transition:
+      transform 160ms ease,
+      opacity 160ms ease,
+      box-shadow 160ms ease;
+
+    &:active {
+      transform: scale(0.97);
+    }
+  `,
+  buttonGhost: `
+    border: 1px solid rgba(214, 177, 189, 0.9);
+    background: rgba(255, 255, 255, 0.86);
+    color: #6a515e;
+  `,
+  buttonPrimary: `
+    border: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(214, 78, 117, 0.96),
+      rgba(227, 102, 138, 0.92)
+    );
+    color: #fff;
+    box-shadow: 0 12px 20px rgba(190, 72, 108, 0.22);
+  `,
+} as const);
+// #endregion
+
 // #region 홈 스타일
 const homeStyles = withEmotionLabels("home", {
   root: `
@@ -747,6 +828,7 @@ const galleryStyles = withEmotionLabels("gallery", {
     background: #f7f7f7;
     display: flex;
     flex-direction: column;
+    contain: layout paint;
   `,
   allPhotosHeader: `
     position: sticky;
@@ -757,8 +839,11 @@ const galleryStyles = withEmotionLabels("gallery", {
     justify-content: center;
     padding: calc(max(0.6rem, env(safe-area-inset-top)) + 0.5rem) 3.2rem 0.8rem;
     border-bottom: 1px solid rgba(220, 220, 220, 0.9);
-    background: rgba(247, 247, 247, 0.96);
-    backdrop-filter: blur(6px);
+    background: rgba(247, 247, 247, 0.98);
+
+    @media (min-width: ${SM_BREAKPOINT}) {
+      backdrop-filter: blur(6px);
+    }
   `,
   allPhotosTitle: `
     margin: 0;
@@ -791,6 +876,8 @@ const galleryStyles = withEmotionLabels("gallery", {
     flex: 1;
     overflow-y: auto;
     overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     padding:
       0.6rem 0.65rem
       calc(max(0.65rem, env(safe-area-inset-bottom)) + 0.4rem);
@@ -804,6 +891,7 @@ const galleryStyles = withEmotionLabels("gallery", {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.62rem;
+    contain: layout paint style;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       gap: 0.78rem;
@@ -816,6 +904,9 @@ const galleryStyles = withEmotionLabels("gallery", {
     background: transparent;
     overflow: hidden;
     cursor: pointer;
+    contain: layout paint style;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 14rem;
 
     &:active {
       transform: scale(0.985);
@@ -826,6 +917,7 @@ const galleryStyles = withEmotionLabels("gallery", {
     overflow: hidden;
     aspect-ratio: 3 / 4;
     background: #e9e2e7;
+    contain: paint;
   `,
   // img GPU eviction 대비 - skeleton 위 z-index 2에 배치, 항상 DOM에 유지되는 skeleton이 blank 시 배경 역할
   allPhotosImage: `
@@ -836,7 +928,11 @@ const galleryStyles = withEmotionLabels("gallery", {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    background: #ece7ea;
+    background: transparent;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
     transition: opacity 220ms ease;
   `,
   allPhotosImageVisible: `
@@ -1719,6 +1815,7 @@ export function useEmotionStyles() {
   return {
     sharedStyles,
     appStyles,
+    pwaNoticeStyles,
     homeStyles,
     contactStyles,
     countdownStyles,
