@@ -88,10 +88,6 @@
         </div>
 
         <template v-else>
-          <p :class="guestbookStyles.guestbook__listStatus">
-            {{ paginationStatusText }}
-          </p>
-
           <ul :class="guestbookStyles.guestbook__commentList">
             <li
               v-for="entry in entries"
@@ -152,42 +148,48 @@
             </li>
           </ul>
 
-          <div
-            v-if="isPaginationVisible"
-            :class="guestbookStyles.guestbook__pagination"
-          >
-            <button
-              type="button"
-              :disabled="!hasPrevPage || isLoadingEntries"
-              :class="guestbookStyles.guestbook__pageButton"
-              @click="goToPrevPage"
-            >
-              이전
-            </button>
+          <div :class="guestbookStyles.guestbook__pagination">
+            <p :class="guestbookStyles.guestbook__listStatus">
+              {{ paginationStatusText }}
+            </p>
 
-            <button
-              v-for="page in pageNumbers"
-              :key="`guestbook-page-${page}`"
-              type="button"
-              :class="[
-                guestbookStyles.guestbook__pageButton,
-                page === currentPage
-                  ? guestbookStyles.guestbook__pageButtonActive
-                  : '',
-              ]"
-              @click="goToPage(page)"
+            <div
+              v-if="isPaginationVisible"
+              :class="guestbookStyles.guestbook__pageButtonRow"
             >
-              {{ page }}
-            </button>
+              <button
+                type="button"
+                :disabled="!hasPrevPage || isLoadingEntries"
+                :class="guestbookStyles.guestbook__pageButton"
+                @click="goToPrevPage"
+              >
+                이전
+              </button>
 
-            <button
-              type="button"
-              :disabled="!hasNextPage || isLoadingEntries"
-              :class="guestbookStyles.guestbook__pageButton"
-              @click="goToNextPage"
-            >
-              다음
-            </button>
+              <button
+                v-for="page in pageNumbers"
+                :key="`guestbook-page-${page}`"
+                type="button"
+                :class="[
+                  guestbookStyles.guestbook__pageButton,
+                  page === currentPage
+                    ? guestbookStyles.guestbook__pageButtonActive
+                    : '',
+                ]"
+                @click="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+
+              <button
+                type="button"
+                :disabled="!hasNextPage || isLoadingEntries"
+                :class="guestbookStyles.guestbook__pageButton"
+                @click="goToNextPage"
+              >
+                다음
+              </button>
+            </div>
           </div>
         </template>
       </article>
