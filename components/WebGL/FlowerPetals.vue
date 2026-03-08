@@ -1,5 +1,5 @@
 <template>
-  <canvas ref="canvas" :class="flowerPetalStyles.canvas"></canvas>
+  <canvas ref="canvas" :class="flowerPetalStyles['flower-petal__canvas']"></canvas>
 </template>
 
 <script setup lang="ts">

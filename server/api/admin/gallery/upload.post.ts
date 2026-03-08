@@ -7,6 +7,7 @@ import {
   getHeader,
   readMultipartFormData,
 } from "h3";
+import { assertAdminAuthorized } from "~/server/utils/adminAuth";
 
 const MAX_IMAGE_SIZE_BYTES = 4 * 1024 * 1024;
 const FILE_NAME_SANITIZE_REGEXP = /[^a-zA-Z0-9._-]/g;
@@ -21,27 +22,6 @@ type MultipartImagePart = MultiPartData & {
   type: string;
   filename?: string;
 };
-
-function assertAdminUploadKey(value: string | undefined): asserts value is string {
-  if (!value) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "ADMIN_UPLOAD_KEY 환경변수 설정 필요",
-    });
-  }
-}
-
-function assertAdminAuthorized(
-  provided: string | undefined,
-  expected: string
-): asserts provided is string {
-  if (provided !== expected) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "관리자 업로드 권한 필요",
-    });
-  }
-}
 
 function assertImagePart(
   value: MultiPartData | undefined
@@ -78,11 +58,9 @@ function createSafeFileName(originalName: string): string {
 }
 
 export default defineEventHandler(async (event) => {
-  const adminUploadKey = process.env.ADMIN_UPLOAD_KEY;
-  assertAdminUploadKey(adminUploadKey);
   const providedUploadKey =
     getHeader(event, "x-admin-upload-key") ?? getHeader(event, "x-admin-key");
-  assertAdminAuthorized(providedUploadKey, adminUploadKey);
+  assertAdminAuthorized(providedUploadKey);
 
   const multipart = await readMultipartFormData(event);
   const filePart = multipart?.find((part) => part.name === "file");

@@ -1,40 +1,57 @@
-import type { RemittanceAccount, WeddingData } from "~/types/wedding";
+import type {
+  GalleryImage,
+  RemittanceAccount,
+  WeddingData,
+} from "~/types/wedding";
 
 const GROOM_REMITTANCE_ACCOUNTS: RemittanceAccount[] = [
   {
     label: "신랑 주정준",
     bank: "국민은행",
-    accountNumber: "000000-00-000000",
+    accountNumber: "940302-00-095515",
   },
   {
     label: "신랑 아버지 주진표",
-    bank: "신한은행",
-    accountNumber: "000-000-000000",
+    bank: "농협은행",
+    accountNumber: "365-1219-7031",
   },
   {
     label: "신랑 어머니 장성애",
-    bank: "하나은행",
-    accountNumber: "000-000000-00000",
+    bank: "농협은행",
+    accountNumber: "351-0465-4608-03",
   },
 ];
 
 const BRIDE_REMITTANCE_ACCOUNTS: RemittanceAccount[] = [
   {
     label: "신부 이인영",
-    bank: "우리은행",
-    accountNumber: "000-0000-000000",
+    bank: "국민은행",
+    accountNumber: "458702-04-347926",
   },
   {
     label: "신부 아버지 이덕수",
-    bank: "농협은행",
-    accountNumber: "000-00-000000",
+    bank: "국민은행",
+    accountNumber: "234-21-0075-085",
   },
   {
     label: "신부 어머니 정지연",
-    bank: "카카오뱅크",
-    accountNumber: "0000-00-0000000",
+    bank: "우리은행",
+    accountNumber: "406-262677-02-001",
   },
 ];
+
+const FALLBACK_GALLERY_IMAGES: GalleryImage[] = Array.from(
+  { length: 6 },
+  (_, i) => ({
+    thumbSrc: `https://source.unsplash.com/random/360x480?wedding,couple&sig=${
+      i + 1
+    }`,
+    fullSrc: `https://source.unsplash.com/random/1280x1706?wedding,couple&sig=${
+      i + 1
+    }`,
+    alt: `웨딩 사진 ${i + 1}`,
+  }),
+);
 
 export const WEDDING_DATA: WeddingData = {
   groom: {
@@ -87,18 +104,13 @@ export const WEDDING_DATA: WeddingData = {
     "서로의 하루를",
     "가장 먼저 나누고 싶은 사람이 되어",
     "이제 평생을 약속하려 합니다.",
-    "해피엔딩이 아닌",
-    "가장 설레는 시작이 될 그날,",
+    "해피 엔딩이 아닌",
+    "해피 비기닝이 될 그 날,",
     "함께 축복해 주세요.",
   ],
   remittanceAccounts: {
     groom: GROOM_REMITTANCE_ACCOUNTS,
     bride: BRIDE_REMITTANCE_ACCOUNTS,
   },
-  galleryImages: Array.from({ length: 6 }, (_, i) => ({
-    src: `https://source.unsplash.com/random/500x500?wedding,couple&sig=${
-      i + 1
-    }`,
-    alt: `웨딩 사진 ${i + 1}`,
-  })),
+  galleryImages: FALLBACK_GALLERY_IMAGES,
 };

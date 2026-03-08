@@ -1,4 +1,4 @@
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
 
 // #region 상수
 const INITIAL_VOLUME = 0.1;
@@ -6,6 +6,7 @@ const PLAYLIST = ["/audio/AWN.mp3"];
 const AUTOPLAY_RETRY_INTERVAL_MS = 800;
 const AUTOPLAY_MAX_RETRY_COUNT = 4;
 const STORAGE_KEY_AUTOPLAY_INTENT = "wedding-bgm-autoplay-intent";
+const STORAGE_KEY_MUTED = "wedding-bgm-muted";
 const STORAGE_KEY_VOLUME = "wedding-bgm-volume";
 const STORAGE_AUTOPLAY_ON = "on";
 const STORAGE_AUTOPLAY_OFF = "off";
@@ -19,8 +20,9 @@ export function useMusicPlayer() {
   const audioPlayer = ref<HTMLAudioElement | null>(null);
   const isPlaying = ref(false);
   const shouldBootMuted = ref(resolvePreferMutedAutoplay());
-  const isMuted = ref(shouldBootMuted.value);
-  const audioMuted = computed(() => shouldBootMuted.value || isMuted.value);
+  const isMuted = ref(false);
+  const isAutoplayMuted = ref(false);
+  const audioMuted = computed(() => isAutoplayMuted.value || isMuted.value);
   const volume = ref(INITIAL_VOLUME);
   const currentIndex = ref(0);
   const autoplayIntent = ref(true);
@@ -31,6 +33,7 @@ export function useMusicPlayer() {
   let visibilityChangeHandler: (() => void) | null = null;
   let canPlayHandler: (() => void) | null = null;
   let pageShowHandler: (() => void) | null = null;
+  let windowFocusHandler: (() => void) | null = null;
   let autoplayRetryTimerId: number | null = null;
   let autoplayRetryCount = 0;
   // #endregion
@@ -88,6 +91,14 @@ export function useMusicPlayer() {
     }
   }
 
+  function persistMuted(nextMuted: boolean) {
+    try {
+      localStorage.setItem(STORAGE_KEY_MUTED, nextMuted ? "on" : "off");
+    } catch {
+      // 저장소 접근 불가 환경 대응 - 런타임 상태만 유지
+    }
+  }
+
   function restorePlaybackPreferences() {
     try {
       const storedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
@@ -96,6 +107,8 @@ export function useMusicPlayer() {
       if (!Number.isNaN(parsedVolume)) {
         volume.value = Math.max(0, Math.min(1, parsedVolume));
       }
+
+      isMuted.value = localStorage.getItem(STORAGE_KEY_MUTED) === "on";
 
       const storedAutoplayIntent = localStorage.getItem(
         STORAGE_KEY_AUTOPLAY_INTENT,
@@ -147,15 +160,10 @@ export function useMusicPlayer() {
   // #endregion
 
   // #region 볼륨 제어
-  // audio muted/defaultMuted 속성 동기화 - 모바일 초기 음소거 자동재생 유지 및 사용자 해제 상태 보존 사용
-  function syncMutedState(nextMuted: boolean) {
-    isMuted.value = nextMuted;
-
-    if (!nextMuted) {
-      shouldBootMuted.value = false;
-    }
-
+  // audio muted/defaultMuted 속성 동기화 - 임시 자동재생 음소거와 사용자 음소거 분리 사용
+  function syncAudioMutedState() {
     if (!audioPlayer.value) return;
+    const nextMuted = audioMuted.value;
     audioPlayer.value.muted = nextMuted;
     audioPlayer.value.defaultMuted = nextMuted;
 
@@ -167,6 +175,18 @@ export function useMusicPlayer() {
     audioPlayer.value.removeAttribute("muted");
   }
 
+  function setUserMuted(nextMuted: boolean) {
+    isMuted.value = nextMuted;
+    persistMuted(nextMuted);
+
+    if (!nextMuted) {
+      shouldBootMuted.value = false;
+      isAutoplayMuted.value = false;
+    }
+
+    syncAudioMutedState();
+  }
+
   /** 볼륨 변경 - audio 요소와 상태 동기화 */
   function setVolume(newVolume: number) {
     volume.value = Math.max(0, Math.min(1, newVolume));
@@ -174,16 +194,16 @@ export function useMusicPlayer() {
     if (!audioPlayer.value) return;
     audioPlayer.value.volume = volume.value;
     if (volume.value === 0) {
-      syncMutedState(true);
-    } else if (isMuted.value) {
-      syncMutedState(false);
+      setUserMuted(true);
+    } else {
+      setUserMuted(false);
     }
   }
 
   /** 음소거 토글 - mute 시 볼륨 아이콘 반영 */
   function toggleMute() {
     if (!audioPlayer.value) return;
-    syncMutedState(!audioPlayer.value.muted);
+    setUserMuted(!audioMuted.value);
   }
   // #endregion
 
@@ -193,7 +213,8 @@ export function useMusicPlayer() {
     if (!audioPlayer.value) return;
     if (isHiddenState()) return;
     try {
-      syncMutedState(false);
+      isAutoplayMuted.value = false;
+      syncAudioMutedState();
       audioPlayer.value.volume = volume.value;
       await audioPlayer.value.play();
       persistAutoplayIntent(true);
@@ -213,7 +234,8 @@ export function useMusicPlayer() {
     if (isHiddenState()) return false;
 
     const el = audioPlayer.value;
-    syncMutedState(muted);
+    isAutoplayMuted.value = muted;
+    syncAudioMutedState();
 
     try {
       await el.play();
@@ -233,8 +255,14 @@ export function useMusicPlayer() {
   function attachUnmuteOnGesture() {
     const unmute = () => {
       if (!audioPlayer.value) return;
-      syncMutedState(false);
+      isAutoplayMuted.value = false;
+      syncAudioMutedState();
       audioPlayer.value.volume = volume.value;
+      if (audioPlayer.value.paused && autoplayIntent.value && !isHiddenState()) {
+        void audioPlayer.value.play().then(() => {
+          isPlaying.value = true;
+        }).catch(() => {});
+      }
       unmuteOnUserGesture = null;
     };
 
@@ -281,9 +309,11 @@ export function useMusicPlayer() {
     const el = audioPlayer.value;
     el.volume = volume.value;
 
-    const orderedMutedStates = preferMutedAutoplay
-      ? [true, false]
-      : [false, true];
+    const orderedMutedStates = isMuted.value
+      ? [true]
+      : preferMutedAutoplay
+        ? [false, true]
+        : [false, true];
 
     for (const mutedState of orderedMutedStates) {
       const hasPlayed = await playWithMutedState(mutedState);
@@ -298,6 +328,12 @@ export function useMusicPlayer() {
 
     attachResumeOnGesture();
     scheduleAutoplayRetry(preferMutedAutoplay);
+  }
+
+  async function recoverPlayback(preferMutedAutoplay: boolean) {
+    if (isPlaying.value) return;
+    if (!autoplayIntent.value) return;
+    await tryAutoplay(preferMutedAutoplay);
   }
 
   /** 다음 트랙 재생 */
@@ -345,23 +381,10 @@ export function useMusicPlayer() {
   // #endregion
 
   // #region 라이프사이클
-  onMounted(() => {
+  onMounted(async () => {
     restorePlaybackPreferences();
     currentIndex.value = Math.floor(Math.random() * PLAYLIST.length);
     const preferMutedAutoplay = resolvePreferMutedAutoplay();
-
-    if (audioPlayer.value) {
-      // 모바일 자동재생 정책 대응 - 초기 muted/defaultMuted 상태 선적용 후 재생 시도 사용
-      if (preferMutedAutoplay && autoplayIntent.value) {
-        syncMutedState(true);
-      }
-
-      audioPlayer.value.volume = volume.value;
-      audioPlayer.value.preload = "auto";
-      audioPlayer.value.load();
-    }
-
-    void tryAutoplay(preferMutedAutoplay);
 
     visibilityChangeHandler = () => {
       if (document.visibilityState === "hidden") {
@@ -369,26 +392,38 @@ export function useMusicPlayer() {
         return;
       }
 
-      if (!isPlaying.value && autoplayIntent.value) {
-        void tryAutoplay(preferMutedAutoplay);
-      }
+      void recoverPlayback(preferMutedAutoplay);
     };
 
     canPlayHandler = () => {
-      if (!isPlaying.value && autoplayIntent.value) {
-        void tryAutoplay(preferMutedAutoplay);
-      }
+      void recoverPlayback(preferMutedAutoplay);
     };
 
     pageShowHandler = () => {
-      if (!isPlaying.value && autoplayIntent.value) {
-        void tryAutoplay(preferMutedAutoplay);
-      }
+      void recoverPlayback(preferMutedAutoplay);
+    };
+
+    windowFocusHandler = () => {
+      void recoverPlayback(preferMutedAutoplay);
     };
 
     document.addEventListener("visibilitychange", visibilityChangeHandler);
-    audioPlayer.value?.addEventListener("canplay", canPlayHandler);
     window.addEventListener("pageshow", pageShowHandler);
+    window.addEventListener("focus", windowFocusHandler);
+
+    await nextTick();
+
+    if (audioPlayer.value) {
+      audioPlayer.value.volume = volume.value;
+      audioPlayer.value.preload = "auto";
+      syncAudioMutedState();
+      audioPlayer.value.addEventListener("canplay", canPlayHandler);
+      audioPlayer.value.load();
+    }
+
+    window.requestAnimationFrame(() => {
+      void recoverPlayback(preferMutedAutoplay);
+    });
   });
 
   onUnmounted(() => {
@@ -410,6 +445,10 @@ export function useMusicPlayer() {
 
     if (pageShowHandler) {
       window.removeEventListener("pageshow", pageShowHandler);
+    }
+
+    if (windowFocusHandler) {
+      window.removeEventListener("focus", windowFocusHandler);
     }
 
     clearAutoplayRetryTimer();

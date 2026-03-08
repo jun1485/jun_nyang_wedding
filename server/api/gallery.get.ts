@@ -1,14 +1,12 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { list } from "@vercel/blob";
 import type { ListBlobResultBlob } from "@vercel/blob";
 import { defineEventHandler, type H3Event, getRequestURL } from "h3";
-
-interface GalleryItem {
-  src: string;
-  alt: string;
-}
+import type { GalleryImage } from "~/types/wedding";
 
 interface LocalGalleryItems {
-  items: GalleryItem[];
+  items: GalleryImage[];
   orderKeys: string[];
 }
 
@@ -34,12 +32,12 @@ function createOrderMap(orderKeys: string[]): Map<string, number> {
   );
 }
 
-function sortGalleryItems(items: GalleryItem[], orderKeys: string[]): GalleryItem[] {
+function sortGalleryItems(items: GalleryImage[], orderKeys: string[]): GalleryImage[] {
   const orderMap = createOrderMap(orderKeys);
 
   return [...items].sort((a, b) => {
-    const aKey = createItemKey(a.src);
-    const bKey = createItemKey(b.src);
+    const aKey = createItemKey(a.fullSrc);
+    const bKey = createItemKey(b.fullSrc);
     const aOrder = orderMap.get(aKey);
     const bOrder = orderMap.get(bKey);
 
@@ -59,6 +57,29 @@ function sortGalleryItems(items: GalleryItem[], orderKeys: string[]): GalleryIte
   });
 }
 
+function createLocalThumbSrc(name: string): string {
+  const localThumbPath = join(process.cwd(), "public", "gallery", "thumbs", name);
+  if (!existsSync(localThumbPath)) {
+    return `/gallery/${name}`;
+  }
+
+  return `/gallery/thumbs/${name}`;
+}
+
+function isLocalOrigin(origin: string): boolean {
+  return /localhost|127\.0\.0\.1|0\.0\.0\.0/.test(origin);
+}
+
+function createOptimizedRemoteThumbSrc(event: H3Event, sourceUrl: string): string {
+  const origin = getRequestURL(event).origin;
+  if (isLocalOrigin(origin)) {
+    return sourceUrl;
+  }
+
+  const encodedSourceUrl = encodeURIComponent(sourceUrl);
+  return `/_vercel/image?url=${encodedSourceUrl}&w=480&q=75`;
+}
+
 async function fetchLocalItems(event: H3Event): Promise<LocalGalleryItems> {
   const files = await fetchLocalManifestItems(event);
   const allowedExtensions = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
@@ -72,7 +93,8 @@ async function fetchLocalItems(event: H3Event): Promise<LocalGalleryItems> {
   return {
     orderKeys: filteredFiles,
     items: filteredFiles.map((name) => ({
-      src: `/gallery/${name}`,
+      thumbSrc: createLocalThumbSrc(name),
+      fullSrc: `/gallery/${name}`,
       alt: createAltText(name),
     })),
   };
@@ -113,7 +135,7 @@ async function fetchBlobItems(): Promise<ListBlobResultBlob[]> {
   return items;
 }
 
-export default defineEventHandler(async (event): Promise<GalleryItem[]> => {
+export default defineEventHandler(async (event): Promise<GalleryImage[]> => {
   try {
     const items = await fetchBlobItems();
     if (items.length > 0) {
@@ -125,7 +147,8 @@ export default defineEventHandler(async (event): Promise<GalleryItem[]> => {
           ),
         )
         .map((item) => ({
-          src: item.url,
+          thumbSrc: createOptimizedRemoteThumbSrc(event, item.url),
+          fullSrc: item.url,
           alt: createAltText(item.pathname),
         }));
     }
