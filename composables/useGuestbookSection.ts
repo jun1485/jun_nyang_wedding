@@ -194,6 +194,10 @@ export function useGuestbookSection() {
       return "댓글 0개";
     }
 
+    if (totalPages.value <= 1) {
+      return `총 ${totalCount.value}개`;
+    }
+
     return `총 ${totalCount.value}개 · ${currentPage.value}/${totalPages.value} 페이지`;
   });
   // #endregion
@@ -338,7 +342,30 @@ export function useGuestbookSection() {
     }
   }
 
-  // 수정 모드 진입 - 비밀번호 prompt 후 인라인 수정 활성화
+  // 비밀번호 즉시 검증 후 수정 모드 진입
+  async function verifyPasswordAndOpenEdit(entry: GuestbookEntry, inputPassword: string) {
+    const fetches = createFetches();
+
+    try {
+      await fetches.updateEntry(entry.id, {
+        password: inputPassword,
+        message: entry.message,
+      });
+      editingEntryId.value = entry.id;
+      editingMessage.value = entry.message;
+      editingPassword.value = inputPassword;
+    } catch (error) {
+      const messageText = error instanceof Error
+        ? resolveErrorMessage(error, "비밀번호가 일치하지 않습니다.")
+        : "비밀번호가 일치하지 않습니다.";
+      openDialog({
+        tone: error instanceof Error ? resolveDialogTone(error) : "error",
+        message: messageText,
+      });
+    }
+  }
+
+  // 수정 모드 진입 - 비밀번호 prompt 후 즉시 서버 검증
   function handleEditEntry(entry: GuestbookEntry) {
     openPromptDialog({
       tone: "info",
@@ -349,9 +376,7 @@ export function useGuestbookSection() {
       confirmText: "확인",
       cancelText: "취소",
       onConfirm: (inputPassword: string) => {
-        editingEntryId.value = entry.id;
-        editingMessage.value = entry.message;
-        editingPassword.value = inputPassword;
+        void verifyPasswordAndOpenEdit(entry, inputPassword);
       },
     });
   }

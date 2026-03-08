@@ -214,7 +214,6 @@
 
       <div
         :class="[galleryStyles.gallery__lightboxViewport, lightboxViewportMotionClass]"
-        :style="lightboxViewportPullStyle"
         @touchstart.passive="onLightboxTouchStart"
         @touchmove.passive="onLightboxTouchMove"
         @touchend.passive="onLightboxTouchEnd"
@@ -372,7 +371,6 @@ const {
   onLightboxImageError,
   lightboxOverlayMotionClass,
   lightboxViewportMotionClass,
-  lightboxViewportPullStyle,
   onLightboxTouchStart,
   onLightboxTouchMove,
   onLightboxTouchEnd,

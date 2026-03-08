@@ -186,7 +186,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
     gap: 0.72rem;
   `,
   guestbook__listStatus: `
-    margin: 0.95rem 0 0;
+    margin: 0;
     color: #8b7280;
     font-size: 0.8rem;
     font-weight: 700;
@@ -255,6 +255,12 @@ const guestbookStyles = withEmotionLabels("guestbook", {
   `,
   guestbook__pagination: `
     margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+  `,
+  guestbook__pageButtonRow: `
     display: flex;
     flex-wrap: wrap;
     align-items: center;

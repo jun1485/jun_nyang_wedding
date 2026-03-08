@@ -26,7 +26,6 @@ const LIGHTBOX_CLOSE_HINT_PULL_THRESHOLD_PX = 28;
 const LIGHTBOX_CLOSE_HINT_WHEEL_THRESHOLD_PX = 48;
 const LIGHTBOX_WHEEL_HINT_RESET_DELAY_MS = 180;
 const LIGHTBOX_CLOSE_ANIMATION_MS = 320;
-const LIGHTBOX_PULL_DAMPING = 0.55;
 const LIGHTBOX_HISTORY_STATE_KEY = "__galleryLightboxLayer";
 // #endregion
 
@@ -165,25 +164,6 @@ export function useGallerySection() {
     }
 
     return "";
-  });
-  // 라이트박스 뷰포트 풀다운 따라오기 인라인 스타일
-  const lightboxViewportPullStyle = computed(() => {
-    if (isLightboxClosing.value) {
-      return {};
-    }
-
-    const distance = lightboxPullDistance.value;
-
-    if (distance <= 0) {
-      return {};
-    }
-
-    const dampedDistance = distance * LIGHTBOX_PULL_DAMPING;
-
-    return {
-      transform: `translateY(${dampedDistance}px)`,
-      transition: "none",
-    };
   });
   const showThumbNavigation = computed(() => thumbPageOffsets.value.length > 1);
   const isThumbBeginning = computed(() => thumbSelectedSnapIndex.value <= 0);
@@ -1130,7 +1110,6 @@ export function useGallerySection() {
     onLightboxImageError,
     lightboxOverlayMotionClass,
     lightboxViewportMotionClass,
-    lightboxViewportPullStyle,
     onLightboxTouchStart,
     onLightboxTouchMove,
     onLightboxTouchEnd,
