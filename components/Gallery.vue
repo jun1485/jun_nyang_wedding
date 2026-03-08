@@ -1,17 +1,17 @@
 <template>
-  <section :class="[sharedStyles.sectionWrap, galleryStyles.sectionOffset]">
-    <div :class="galleryStyles.header">
-      <span :class="sharedStyles.floralChip">Gallery</span>
-      <h2 :class="[sharedStyles.sectionTitle, galleryStyles.title]">우리의 순간</h2>
-      <p :class="[sharedStyles.sectionSubtitle, galleryStyles.subtitle]">사진을 누르면 크게 볼 수 있어요</p>
+  <section :class="[sharedStyles.shared__sectionWrap, galleryStyles.gallery__sectionOffset]">
+    <div :class="galleryStyles.gallery__header">
+      <span :class="sharedStyles.shared__floralChip">Gallery</span>
+      <h2 :class="[sharedStyles.shared__sectionTitle, galleryStyles.gallery__title]">우리의 순간</h2>
+      <p :class="[sharedStyles.shared__sectionSubtitle, galleryStyles.gallery__subtitle]">사진을 누르면 크게 볼 수 있어요</p>
     </div>
 
-    <div :class="galleryStyles.carouselShell">
+    <div :class="galleryStyles.gallery__carouselShell">
       <button
         v-if="showThumbNavigation"
         type="button"
         :disabled="isThumbBeginning"
-        :class="[galleryStyles.carouselNavButton, galleryStyles.carouselNavButtonLeft]"
+        :class="[galleryStyles.gallery__carouselNavButton, galleryStyles.gallery__carouselNavButtonLeft]"
         aria-label="썸네일 이전"
         @click="scrollThumbPrev"
       >
@@ -21,7 +21,7 @@
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          :class="galleryStyles.icon"
+          :class="galleryStyles.gallery__icon"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
@@ -31,7 +31,7 @@
         v-if="showThumbNavigation"
         type="button"
         :disabled="isThumbEnd"
-        :class="[galleryStyles.carouselNavButton, galleryStyles.carouselNavButtonRight]"
+        :class="[galleryStyles.gallery__carouselNavButton, galleryStyles.gallery__carouselNavButtonRight]"
         aria-label="썸네일 다음"
         @click="scrollThumbNext"
       >
@@ -41,7 +41,7 @@
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          :class="galleryStyles.icon"
+          :class="galleryStyles.gallery__icon"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
         </svg>
@@ -49,39 +49,39 @@
 
       <div
         ref="thumbViewportRef"
-        :class="galleryStyles.carouselViewport"
+        :class="galleryStyles.gallery__carouselViewport"
       >
-        <div :class="galleryStyles.carouselContainer">
+        <div :class="galleryStyles.gallery__carouselContainer">
           <div
             v-for="(image, index) in store.galleryImages"
-            :key="`${image.src}-${index}`"
-            :class="galleryStyles.carouselSlide"
+            :key="`${image.fullSrc}-${index}`"
+            :class="galleryStyles.gallery__carouselSlide"
           >
             <button
               :ref="(el) => registerThumb(el as Element | null, index)"
               type="button"
-              :class="galleryStyles.thumbButton"
-              @click="openLightbox(index, image.src)"
+              :class="galleryStyles.gallery__thumbButton"
+              @click="openLightbox(index, image.fullSrc)"
             >
               <img
                 v-if="isThumbReady(index)"
-                :src="image.src"
+                :src="image.thumbSrc"
                 :alt="image.alt"
                 :class="[
-                  galleryStyles.thumbImage,
+                  galleryStyles.gallery__thumbImage,
                   isThumbLoaded(index)
-                    ? galleryStyles.thumbImageVisible
-                    : galleryStyles.thumbImageHidden,
+                    ? galleryStyles.gallery__thumbImageVisible
+                    : galleryStyles.gallery__thumbImageHidden,
                 ]"
                 @load="markThumbLoaded(index)"
                 @error="markThumbError(index)"
               />
-              <div v-if="!isThumbReady(index)" :class="galleryStyles.thumbPlaceholder" />
-              <div v-else-if="!isThumbLoaded(index)" :class="galleryStyles.thumbLoadingOverlay">
-                <span :class="galleryStyles.thumbLoadingSpinner" />
-                <span :class="galleryStyles.thumbLoadingText">로딩 중</span>
+              <div v-if="!isThumbReady(index)" :class="galleryStyles.gallery__thumbPlaceholder" />
+              <div v-else-if="!isThumbLoaded(index)" :class="galleryStyles.gallery__thumbLoadingOverlay">
+                <span :class="galleryStyles.gallery__thumbLoadingSpinner" />
+                <span :class="galleryStyles.gallery__thumbLoadingText">로딩 중</span>
               </div>
-              <div :class="galleryStyles.thumbCaption">{{ index + 1 }}번째 추억</div>
+              <div :class="galleryStyles.gallery__thumbCaption">{{ index + 1 }}번째 추억</div>
             </button>
           </div>
         </div>
@@ -89,10 +89,10 @@
 
     </div>
 
-    <div :class="galleryStyles.viewAllButtonWrap">
+    <div :class="galleryStyles.gallery__viewAllButtonWrap">
       <button
         type="button"
-        :class="galleryStyles.viewAllButton"
+        :class="galleryStyles.gallery__viewAllButton"
         :disabled="totalImages === 0"
         @click="openAllPhotosLayer"
       >
@@ -102,15 +102,15 @@
 
     <div
       v-if="isAllPhotosLayerOpen"
-      :class="galleryStyles.allPhotosLayer"
+      :class="[galleryStyles.gallery__allPhotosLayer, allPhotosLayerMotionClass]"
       @click.self="closeAllPhotosLayer"
     >
-      <div :class="galleryStyles.allPhotosPanel">
-        <div :class="galleryStyles.allPhotosHeader">
-          <h3 :class="galleryStyles.allPhotosTitle">사진 전체보기</h3>
+      <div :class="[galleryStyles.gallery__allPhotosPanel, allPhotosPanelMotionClass]">
+        <div :class="galleryStyles.gallery__allPhotosHeader">
+          <h3 :class="galleryStyles.gallery__allPhotosTitle">사진 전체보기</h3>
           <button
             type="button"
-            :class="galleryStyles.allPhotosCloseButton"
+            :class="galleryStyles.gallery__allPhotosCloseButton"
             aria-label="사진 전체보기 닫기"
             @click="closeAllPhotosLayer"
           >
@@ -120,7 +120,7 @@
               fill="none"
               stroke="currentColor"
               stroke-width="2"
-              :class="galleryStyles.icon"
+              :class="galleryStyles.gallery__icon"
             >
               <path
                 stroke-linecap="round"
@@ -132,44 +132,50 @@
         </div>
 
         <div
-          :class="galleryStyles.allPhotosBody"
+          ref="allPhotosBodyRef"
+          :class="galleryStyles.gallery__allPhotosBody"
+          @wheel.passive="onAllPhotosWheel"
+          @touchstart.passive="onAllPhotosTouchStart"
+          @touchmove.passive="onAllPhotosTouchMove"
+          @touchend.passive="onAllPhotosTouchEnd"
+          @touchcancel.passive="onAllPhotosTouchEnd"
         >
-          <div :class="galleryStyles.allPhotosGrid">
+          <div :class="galleryStyles.gallery__allPhotosGrid">
             <button
               v-for="(image, index) in allPhotosVisibleImages"
-              :key="`gallery-all-${image.src}-${index}`"
+              :key="`gallery-all-${image.fullSrc}-${index}`"
               type="button"
-              :class="galleryStyles.allPhotosItemButton"
-              @click="openLightboxFromAllPhotos(index, image.src)"
+              :class="galleryStyles.gallery__allPhotosItemButton"
+              @click="openLightboxFromAllPhotos(index, image.fullSrc)"
             >
-              <div :class="galleryStyles.allPhotosMedia">
+              <div :class="galleryStyles.gallery__allPhotosMedia">
                 <img
-                  :ref="(el) => registerAllPhotosImage(el, image.src)"
-                  :src="image.src"
+                  :ref="(el) => registerAllPhotosImage(el, image.thumbSrc)"
+                  :src="image.thumbSrc"
                   :alt="image.alt"
                   loading="lazy"
                   fetchpriority="low"
                   decoding="sync"
                   :class="[
-                    galleryStyles.allPhotosImage,
-                    isAllPhotosImageLoaded(image.src)
-                      ? galleryStyles.allPhotosImageVisible
-                      : galleryStyles.allPhotosImageHidden,
+                    galleryStyles.gallery__allPhotosImage,
+                    isAllPhotosImageLoaded(image.thumbSrc)
+                      ? galleryStyles.gallery__allPhotosImageVisible
+                      : galleryStyles.gallery__allPhotosImageHidden,
                   ]"
-                  @load="markAllPhotosImageLoaded(image.src)"
-                  @error="markAllPhotosImageError(image.src)"
+                  @load="markAllPhotosImageLoaded(image.thumbSrc)"
+                  @error="markAllPhotosImageError(image.thumbSrc)"
                 />
                 <div
                   :class="[
-                    galleryStyles.allPhotosSkeleton,
-                    isAllPhotosImageLoaded(image.src) ? galleryStyles.allPhotosSkeletonDone : '',
+                    galleryStyles.gallery__allPhotosSkeleton,
+                    isAllPhotosImageLoaded(image.thumbSrc) ? galleryStyles.gallery__allPhotosSkeletonDone : '',
                   ]"
                 />
                 <div
-                  v-if="!isAllPhotosImageLoaded(image.src)"
-                  :class="galleryStyles.allPhotosLoadingOverlay"
+                  v-if="!isAllPhotosImageLoaded(image.thumbSrc)"
+                  :class="galleryStyles.gallery__allPhotosLoadingOverlay"
                 >
-                  <span :class="galleryStyles.allPhotosLoadingSpinner" />
+                  <span :class="galleryStyles.gallery__allPhotosLoadingSpinner" />
                 </div>
               </div>
             </button>
@@ -180,12 +186,13 @@
 
     <div
       v-if="isLightboxOpen"
-      :class="galleryStyles.overlay"
+      :class="[galleryStyles.gallery__overlay, lightboxOverlayMotionClass]"
       @click.self="closeLightbox"
+      @wheel.passive="onLightboxWheel"
     >
       <button
         type="button"
-        :class="galleryStyles.closeButton"
+        :class="galleryStyles.gallery__closeButton"
         @click="closeLightbox"
         aria-label="닫기"
       >
@@ -195,7 +202,7 @@
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          :class="galleryStyles.icon"
+          :class="galleryStyles.gallery__icon"
         >
           <path
             stroke-linecap="round"
@@ -206,29 +213,43 @@
       </button>
 
       <div
-        :class="galleryStyles.lightboxViewport"
+        :class="[galleryStyles.gallery__lightboxViewport, lightboxViewportMotionClass]"
+        :style="lightboxViewportPullStyle"
         @touchstart.passive="onLightboxTouchStart"
+        @touchmove.passive="onLightboxTouchMove"
         @touchend.passive="onLightboxTouchEnd"
         @touchcancel.passive="onLightboxTouchCancel"
       >
-        <div :class="galleryStyles.lightboxContainer">
-          <div :class="galleryStyles.lightboxSlide">
-            <img
-              v-if="currentLightboxImage"
-              :key="currentLightboxImageKey"
-              :src="currentLightboxImage.src"
-              :alt="currentLightboxImage.alt"
-              decoding="async"
-              :class="[galleryStyles.lightboxImage, currentLightboxMotionClass]"
-              @load="onLightboxImageLoad"
-              @error="onLightboxImageLoad"
-            />
+        <div :class="galleryStyles.gallery__lightboxContainer">
+          <div :class="galleryStyles.gallery__lightboxSlide">
+            <div :class="galleryStyles.gallery__lightboxMedia">
+              <Transition
+                :enter-active-class="currentLightboxTransitionClasses.enterActiveClass"
+                :enter-from-class="currentLightboxTransitionClasses.enterFromClass"
+                :enter-to-class="currentLightboxTransitionClasses.enterToClass"
+                :leave-active-class="currentLightboxTransitionClasses.leaveActiveClass"
+                :leave-from-class="currentLightboxTransitionClasses.leaveFromClass"
+                :leave-to-class="currentLightboxTransitionClasses.leaveToClass"
+              >
+                <img
+                  v-if="currentLightboxImage"
+                  :key="currentLightboxImageKey"
+                  :src="currentLightboxImage.fullSrc"
+                  :alt="currentLightboxImage.alt"
+                  :data-image-src="currentLightboxImage.fullSrc"
+                  decoding="async"
+                  :class="galleryStyles.gallery__lightboxImage"
+                  @load="onLightboxImageLoad"
+                  @error="onLightboxImageError"
+                />
+              </Transition>
+            </div>
             <div
               v-if="currentLightboxImage && !isLightboxImageLoaded"
-              :class="galleryStyles.lightboxLoadingOverlay"
+              :class="galleryStyles.gallery__lightboxLoadingOverlay"
             >
-              <span :class="galleryStyles.lightboxLoadingSpinner" />
-              <span :class="galleryStyles.lightboxLoadingText">사진 불러오는 중</span>
+              <span :class="galleryStyles.gallery__lightboxLoadingSpinner" />
+              <span :class="galleryStyles.gallery__lightboxLoadingText">사진 불러오는 중</span>
             </div>
           </div>
         </div>
@@ -237,7 +258,7 @@
       <button
         type="button"
         :disabled="!hasPrev"
-        :class="[galleryStyles.navButton, galleryStyles.navButtonLeft]"
+        :class="[galleryStyles.gallery__navButton, galleryStyles.gallery__navButtonLeft]"
         @click.stop="slidePrev"
         aria-label="이전"
       >
@@ -247,7 +268,7 @@
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          :class="galleryStyles.icon"
+          :class="galleryStyles.gallery__icon"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
@@ -256,7 +277,7 @@
       <button
         type="button"
         :disabled="!hasNext"
-        :class="[galleryStyles.navButton, galleryStyles.navButtonRight]"
+        :class="[galleryStyles.gallery__navButton, galleryStyles.gallery__navButtonRight]"
         @click.stop="slideNext"
         aria-label="다음"
       >
@@ -266,21 +287,21 @@
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          :class="galleryStyles.icon"
+          :class="galleryStyles.gallery__icon"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </button>
 
-      <div :class="galleryStyles.counter">
+      <div :class="galleryStyles.gallery__counter">
         {{ currentLightboxIndex + 1 }} / {{ totalImages }}
       </div>
 
-      <div :class="galleryStyles.lightboxControlBar">
+      <div :class="galleryStyles.gallery__lightboxControlBar">
         <button
           type="button"
           :disabled="!hasPrev"
-          :class="galleryStyles.lightboxControlButton"
+          :class="galleryStyles.gallery__lightboxControlButton"
           aria-label="이전 사진"
           @click.stop="slidePrev"
         >
@@ -289,7 +310,7 @@
         <button
           type="button"
           :disabled="!hasNext"
-          :class="galleryStyles.lightboxControlButton"
+          :class="galleryStyles.gallery__lightboxControlButton"
           aria-label="다음 사진"
           @click.stop="slideNext"
         >
@@ -316,14 +337,17 @@ const {
   registerAllPhotosImage,
   isAllPhotosImageLoaded,
   registerThumb,
+  allPhotosBodyRef,
   allPhotosVisibleImages,
   totalImages,
   isAllPhotosLayerOpen,
+  allPhotosLayerMotionClass,
+  allPhotosPanelMotionClass,
   isLightboxOpen,
   currentLightboxIndex,
   currentLightboxImage,
   currentLightboxImageKey,
-  currentLightboxMotionClass,
+  currentLightboxTransitionClasses,
   isLightboxImageLoaded,
   hasPrev,
   hasNext,
@@ -336,13 +360,23 @@ const {
   closeAllPhotosLayer,
   openLightboxFromAllPhotos,
   closeLightbox,
+  onAllPhotosWheel,
+  onAllPhotosTouchStart,
+  onAllPhotosTouchMove,
+  onAllPhotosTouchEnd,
   scrollThumbPrev,
   scrollThumbNext,
   slidePrev,
   slideNext,
   onLightboxImageLoad,
+  onLightboxImageError,
+  lightboxOverlayMotionClass,
+  lightboxViewportMotionClass,
+  lightboxViewportPullStyle,
   onLightboxTouchStart,
+  onLightboxTouchMove,
   onLightboxTouchEnd,
   onLightboxTouchCancel,
+  onLightboxWheel,
 } = useGallerySection();
 </script>

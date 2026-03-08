@@ -21,6 +21,12 @@ export interface RemittanceAccounts {
   bride: RemittanceAccount[];
 }
 
+export interface GalleryImage {
+  thumbSrc: string;
+  fullSrc: string;
+  alt: string;
+}
+
 export interface WeddingData {
   groom: Person & { parents: Parent[] };
   bride: Person & { parents: Parent[] };
@@ -37,5 +43,5 @@ export interface WeddingData {
   };
   invitationMessage: string[];
   remittanceAccounts: RemittanceAccounts;
-  galleryImages: { src: string; alt: string }[];
+  galleryImages: GalleryImage[];
 }

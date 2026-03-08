@@ -1,8 +1,8 @@
 <template>
-  <div :class="musicPlayerStyles.dock">
+  <div :class="musicPlayerStyles['music-player__dock']">
     <button
       type="button"
-      :class="musicPlayerStyles.button"
+      :class="musicPlayerStyles['music-player__button']"
       @click="togglePlay"
       :title="isPlaying ? '음악 일시정지' : '음악 재생'"
       :aria-label="isPlaying ? '음악 일시정지' : '음악 재생'"
@@ -12,7 +12,7 @@
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="currentColor"
-        :class="musicPlayerStyles.icon"
+        :class="musicPlayerStyles['music-player__icon']"
       >
         <path d="M8 6h3v12H8zm5 0h3v12h-3z" />
       </svg>
@@ -21,7 +21,7 @@
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="currentColor"
-        :class="musicPlayerStyles.icon"
+        :class="musicPlayerStyles['music-player__icon']"
       >
         <path d="M8 5v14l11-7z" />
       </svg>
@@ -29,7 +29,7 @@
 
     <button
       type="button"
-      :class="musicPlayerStyles.button"
+      :class="musicPlayerStyles['music-player__button']"
       @click="toggleMute"
       :title="isMuted ? '음소거 해제' : '음소거'"
       :aria-label="isMuted ? '음소거 해제' : '음소거'"
@@ -41,7 +41,7 @@
         fill="none"
         stroke="currentColor"
         stroke-width="2"
-        :class="musicPlayerStyles.icon"
+        :class="musicPlayerStyles['music-player__icon']"
       >
         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5 6 9H3v6h3l5 4V5Z" />
         <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-6 6" />
@@ -54,7 +54,7 @@
         fill="none"
         stroke="currentColor"
         stroke-width="2"
-        :class="musicPlayerStyles.icon"
+        :class="musicPlayerStyles['music-player__icon']"
       >
         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5 6 9H3v6h3l5 4V5Z" />
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.5 8.5a5 5 0 0 1 0 7" />
@@ -63,7 +63,7 @@
 
     <input
       type="range"
-      :class="musicPlayerStyles.volume"
+      :class="musicPlayerStyles['music-player__volume']"
       min="0"
       max="1"
       step="0.01"
@@ -73,7 +73,7 @@
       aria-label="볼륨 조절"
     />
 
-    <span :class="musicPlayerStyles.label">BGM</span>
+    <span :class="musicPlayerStyles['music-player__label']">BGM</span>
 
     <audio
       ref="audioPlayer"

@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
-import type { WeddingData } from "~/types/wedding";
+import type { GalleryImage, WeddingData } from "~/types/wedding";
 
 export const useWeddingStore = defineStore("wedding", () => {
   const weddingData = ref<WeddingData | null>(null);
   const error = ref<Error | null>(null);
-  const gallery = ref<{ src: string; alt: string }[] | null>(null);
+  const gallery = ref<GalleryImage[] | null>(null);
 
   const fetchWeddingData = async () => {
     if (weddingData.value) return;
@@ -22,7 +22,7 @@ export const useWeddingStore = defineStore("wedding", () => {
 
   const fetchGallery = async () => {
     if (gallery.value) return;
-    const { data } = await useFetch<{ src: string; alt: string }[]>(
+    const { data } = await useFetch<GalleryImage[]>(
       "/api/gallery"
     );
     if (data.value && data.value.length > 0) {
