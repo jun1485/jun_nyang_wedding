@@ -8,36 +8,6 @@ export default defineNuxtPlugin(() => {
   const activeFontFamily = getActiveFontFamily();
 
   injectGlobal`
-    @font-face {
-      font-family: "Ongleip ParkDahyeon";
-      src: url("/fonts/ongleip-parkdahyeon.ttf") format("truetype");
-      font-display: swap;
-    }
-
-    @font-face {
-      font-family: "Font Two";
-      src: url("/fonts/font-2.ttf") format("truetype");
-      font-display: swap;
-    }
-
-    @font-face {
-      font-family: "Griun Gellyroll";
-      src: url("/fonts/griun-gellyroll-rg.ttf") format("truetype");
-      font-display: swap;
-    }
-
-    @font-face {
-      font-family: "Griun Mongtori";
-      src: url("/fonts/griun-mongtori-rg.ttf") format("truetype");
-      font-display: swap;
-    }
-
-    @font-face {
-      font-family: "Memoment Kkukkukk";
-      src: url("/fonts/memoment-kkukkukk.ttf") format("truetype");
-      font-display: swap;
-    }
-
     :root {
       --petal-50: #fff9fb;
       --petal-100: #ffeef3;

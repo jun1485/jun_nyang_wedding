@@ -67,7 +67,7 @@ const dialogStyles = withDialogLabels({
     min-height: 1.85rem;
     padding: 0.25rem 0.72rem;
     border-radius: 9999px;
-    font-size: 0.72rem;
+    font-size: calc(0.72rem + 3px);
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -94,7 +94,7 @@ const dialogStyles = withDialogLabels({
   dialog__message: `
     margin: 0.55rem 0 0;
     color: #6a5060;
-    font-size: 0.93rem;
+    font-size: calc(0.93rem + 3px);
     line-height: 1.65;
     white-space: pre-line;
     word-break: break-word;
@@ -105,7 +105,7 @@ const dialogStyles = withDialogLabels({
     border-radius: 1rem;
     background: rgba(255, 249, 251, 0.86);
     color: #6a5060;
-    font-size: 0.88rem;
+    font-size: calc(0.88rem + 3px);
     font-weight: 700;
     line-height: 1.6;
     word-break: break-all;
@@ -128,7 +128,7 @@ const dialogStyles = withDialogLabels({
     border-radius: 0.75rem;
     background: rgba(255, 252, 253, 0.92);
     color: #3f2b35;
-    font-size: 0.93rem;
+    font-size: calc(0.93rem + 3px);
     line-height: 1.5;
     padding: 0.65rem 0.8rem;
     outline: none;
@@ -154,7 +154,7 @@ const dialogStyles = withDialogLabels({
     border-radius: 9999px;
     background: rgba(255, 255, 255, 0.9);
     color: #7a5464;
-    font-size: 0.88rem;
+    font-size: calc(0.88rem + 3px);
     font-weight: 700;
     line-height: 1;
     padding: 0.62rem 1rem;

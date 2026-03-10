@@ -68,12 +68,12 @@ const guestbookStyles = withEmotionLabels("guestbook", {
   `,
   guestbook__fieldLabel: `
     color: #442f39;
-    font-size: 0.92rem;
+    font-size: calc(1.1rem + 2px);
     font-weight: 700;
   `,
   guestbook__fieldCount: `
     color: #8b7280;
-    font-size: 0.74rem;
+    font-size: calc(0.74rem + 2px);
     font-weight: 700;
   `,
   guestbook__input: `
@@ -82,7 +82,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
     border-radius: 0.95rem;
     background: rgba(255, 255, 255, 0.9);
     color: #402d36;
-    font-size: 0.95rem;
+    font-size: calc(1.1rem + 2px);
     padding: 0.82rem 0.95rem;
     outline: none;
     transition:
@@ -108,7 +108,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
     border-radius: 1rem;
     background: rgba(255, 255, 255, 0.9);
     color: #402d36;
-    font-size: 0.95rem;
+    font-size: calc(1.1rem + 2px);
     line-height: 1.65;
     padding: 0.9rem 0.95rem;
     outline: none;
@@ -119,6 +119,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
 
     &::placeholder {
       color: #ab93a0;
+       font-size: calc(1rem + 2px);
     }
 
     &:focus {
@@ -133,6 +134,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
   `,
   guestbook__submitButton: `
     min-width: 8.4rem;
+    font-size: calc(0.92rem + 2px);
 
     &:disabled {
       opacity: 0.5;
@@ -149,7 +151,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
   guestbook__listTitle: `
     margin: 0;
     color: #432f39;
-    font-size: 1.05rem;
+    font-size: 1.3rem;
     font-weight: 700;
   `,
   guestbook__refreshButton: `
@@ -157,7 +159,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
     border-radius: 9999px;
     background: rgba(255, 241, 246, 0.95);
     color: #b13e67;
-    font-size: 0.78rem;
+    font-size: calc(0.78rem + 2px);
     font-weight: 700;
     padding: 0.46rem 0.8rem;
     cursor: pointer;
@@ -173,7 +175,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
     border-radius: 1rem;
     background: rgba(255, 249, 251, 0.76);
     color: #876876;
-    font-size: 0.9rem;
+    font-size: calc(0.9rem + 2px);
     text-align: center;
     padding: 1.25rem 1rem;
   `,
@@ -184,12 +186,6 @@ const guestbookStyles = withEmotionLabels("guestbook", {
     display: flex;
     flex-direction: column;
     gap: 0.72rem;
-  `,
-  guestbook__listStatus: `
-    margin: 0;
-    color: #8b7280;
-    font-size: 0.8rem;
-    font-weight: 700;
   `,
   guestbook__commentItem: `
     border: 1px solid rgba(231, 90, 132, 0.14);
@@ -205,18 +201,18 @@ const guestbookStyles = withEmotionLabels("guestbook", {
   `,
   guestbook__commentAuthor: `
     color: #432f39;
-    font-size: 0.95rem;
+    font-size: calc(1.05rem + 2px);
     font-weight: 700;
   `,
   guestbook__commentDate: `
     color: #987b88;
-    font-size: 0.73rem;
+    font-size: calc(0.73rem + 2px);
     white-space: nowrap;
   `,
   guestbook__commentMessage: `
-    margin: 0.55rem 0 0;
+    margin: 0.3rem 0 0;
     color: #5d4651;
-    font-size: 0.92rem;
+    font-size: calc(1rem + 2px);
     line-height: 1.65;
     white-space: pre-line;
     word-break: break-word;
@@ -232,7 +228,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
     border-radius: 0.55rem;
     background: rgba(255, 255, 255, 0.9);
     color: #8a5367;
-    font-size: 0.72rem;
+    font-size: calc(0.9rem + 2px);
     font-weight: 700;
     line-height: 1;
     padding: 0.38rem 0.65rem;
@@ -274,7 +270,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
     border-radius: 9999px;
     background: rgba(255, 255, 255, 0.92);
     color: #8a5367;
-    font-size: 0.82rem;
+    font-size: calc(0.82rem + 2px);
     font-weight: 700;
     padding: 0.5rem 0.8rem;
     cursor: pointer;
@@ -332,7 +328,7 @@ const adminStyles = withEmotionLabels("admin", {
   `,
   admin__label: `
     color: #5f4552;
-    font-size: 0.9rem;
+    font-size: calc(0.9rem + 2px);
     font-weight: 700;
   `,
   admin__authRow: `
@@ -352,7 +348,7 @@ const adminStyles = withEmotionLabels("admin", {
     border-radius: 1rem;
     background: rgba(255, 250, 252, 0.92);
     color: #4d3742;
-    font-size: 0.95rem;
+    font-size: calc(0.95rem + 2px);
     padding: 0 1rem;
     outline: none;
 
@@ -372,7 +368,7 @@ const adminStyles = withEmotionLabels("admin", {
     border-radius: 9999px;
     background: rgba(255, 255, 255, 0.76);
     color: #8b5167;
-    font-size: 0.92rem;
+    font-size: calc(0.92rem + 2px);
     font-weight: 700;
     padding: 0.8rem 1rem;
     cursor: pointer;
@@ -391,7 +387,7 @@ const adminStyles = withEmotionLabels("admin", {
   admin__statusText: `
     margin: 0;
     color: #876876;
-    font-size: 0.9rem;
+    font-size: calc(0.9rem + 2px);
   `,
   admin__grid: `
     margin-top: 1rem;
@@ -426,7 +422,7 @@ const adminStyles = withEmotionLabels("admin", {
 
     dt {
       color: #8c6677;
-      font-size: 0.85rem;
+      font-size: calc(0.85rem + 2px);
       font-weight: 700;
       margin: 0;
     }
@@ -434,7 +430,7 @@ const adminStyles = withEmotionLabels("admin", {
     dd {
       margin: 0;
       color: #4d3742;
-      font-size: 0.92rem;
+      font-size: calc(0.92rem + 2px);
       word-break: break-word;
     }
   `,
@@ -485,17 +481,17 @@ const adminStyles = withEmotionLabels("admin", {
   `,
   admin__commentAuthor: `
     color: #432f39;
-    font-size: 0.92rem;
+    font-size: calc(0.92rem + 2px);
     font-weight: 700;
   `,
   admin__commentDate: `
     color: #987b88;
-    font-size: 0.74rem;
+    font-size: calc(0.74rem + 2px);
     white-space: nowrap;
   `,
   admin__commentMessage: `
     color: #5d4651;
-    font-size: 0.9rem;
+    font-size: calc(0.9rem + 2px);
     line-height: 1.6;
     white-space: pre-line;
     word-break: break-word;
@@ -506,7 +502,7 @@ const adminStyles = withEmotionLabels("admin", {
     border-radius: 1rem;
     background: rgba(255, 249, 251, 0.76);
     color: #876876;
-    font-size: 0.9rem;
+    font-size: calc(0.9rem + 2px);
     text-align: center;
     padding: 1rem;
   `,
@@ -523,7 +519,7 @@ const adminStyles = withEmotionLabels("admin", {
   admin__quotaGuide: `
     margin: 0;
     color: #876876;
-    font-size: 0.88rem;
+    font-size: calc(0.88rem + 2px);
   `,
   admin__quotaList: `
     margin: 0;
@@ -550,7 +546,7 @@ const adminStyles = withEmotionLabels("admin", {
   `,
   admin__quotaLabel: `
     color: #432f39;
-    font-size: 0.96rem;
+    font-size: calc(0.96rem + 2px);
     font-weight: 700;
   `,
   admin__quotaStatusBadge: `
@@ -560,7 +556,7 @@ const adminStyles = withEmotionLabels("admin", {
     min-height: 1.7rem;
     padding: 0.2rem 0.55rem;
     border-radius: 9999px;
-    font-size: 0.73rem;
+    font-size: calc(0.73rem + 2px);
     font-weight: 700;
     white-space: nowrap;
   `,
@@ -590,29 +586,24 @@ const adminStyles = withEmotionLabels("admin", {
     dt {
       margin: 0;
       color: #8c6677;
-      font-size: 0.84rem;
+      font-size: calc(0.84rem + 2px);
       font-weight: 700;
     }
 
     dd {
       margin: 0;
       color: #4d3742;
-      font-size: 0.9rem;
+      font-size: calc(0.9rem + 2px);
       word-break: break-word;
     }
   `,
   admin__quotaNote: `
     margin: 0.8rem 0 0;
     color: #876876;
-    font-size: 0.84rem;
+    font-size: calc(0.84rem + 2px);
     line-height: 1.5;
   `,
 } as const);
 // #endregion
 
-
-export {
-  guestbookStyles,
-  adminStyles,
-};
-
+export { guestbookStyles, adminStyles };

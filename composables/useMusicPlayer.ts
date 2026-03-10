@@ -12,6 +12,10 @@ const STORAGE_AUTOPLAY_ON = "on";
 const STORAGE_AUTOPLAY_OFF = "off";
 // #endregion
 
+// #region 타입
+type AutoplayPolicy = "allowed" | "allowed-muted" | "disallowed";
+// #endregion
+
 /**
  * 음악 플레이어 composable - 재생/일시정지, 음소거, 볼륨 조절, 트랙 전환 제공
  */
@@ -21,7 +25,7 @@ export function useMusicPlayer() {
   const isPlaying = ref(false);
   const shouldBootMuted = ref(resolvePreferMutedAutoplay());
   const isMuted = ref(false);
-  const isAutoplayMuted = ref(false);
+  const isAutoplayMuted = ref(shouldBootMuted.value);
   const audioMuted = computed(() => isAutoplayMuted.value || isMuted.value);
   const volume = ref(INITIAL_VOLUME);
   const currentIndex = ref(0);
@@ -32,6 +36,7 @@ export function useMusicPlayer() {
   let unmuteOnUserGesture: (() => void) | null = null;
   let visibilityChangeHandler: (() => void) | null = null;
   let canPlayHandler: (() => void) | null = null;
+  let canPlayThroughHandler: (() => void) | null = null;
   let pageShowHandler: (() => void) | null = null;
   let windowFocusHandler: (() => void) | null = null;
   let autoplayRetryTimerId: number | null = null;
@@ -147,6 +152,43 @@ export function useMusicPlayer() {
     return isMobileAutoplayUserAgent(navigator.userAgent);
   }
 
+  function resolveNavigatorAutoplayPolicy(
+    mediaElement: HTMLMediaElement,
+  ): AutoplayPolicy | null {
+    if (typeof navigator === "undefined") return null;
+
+    const autoplayNavigator = navigator as Navigator & {
+      getAutoplayPolicy?: (
+        target: "mediaelement" | HTMLMediaElement,
+      ) => AutoplayPolicy;
+    };
+
+    if (!autoplayNavigator.getAutoplayPolicy) {
+      return null;
+    }
+
+    return autoplayNavigator.getAutoplayPolicy(mediaElement);
+  }
+
+  function resolveAutoplayMutedStates(
+    preferMutedAutoplay: boolean,
+    autoplayPolicy: AutoplayPolicy | null,
+  ): boolean[] {
+    if (isMuted.value) {
+      return [true];
+    }
+
+    if (
+      autoplayPolicy === "allowed-muted"
+      || autoplayPolicy === "disallowed"
+      || preferMutedAutoplay
+    ) {
+      return [true, false];
+    }
+
+    return [false, true];
+  }
+
   function clearAutoplayRetryTimer() {
     if (autoplayRetryTimerId == null) return;
     window.clearTimeout(autoplayRetryTimerId);
@@ -235,6 +277,7 @@ export function useMusicPlayer() {
 
     const el = audioPlayer.value;
     isAutoplayMuted.value = muted;
+    shouldBootMuted.value = false;
     syncAudioMutedState();
 
     try {
@@ -308,12 +351,11 @@ export function useMusicPlayer() {
     if (!autoplayIntent.value) return;
     const el = audioPlayer.value;
     el.volume = volume.value;
-
-    const orderedMutedStates = isMuted.value
-      ? [true]
-      : preferMutedAutoplay
-        ? [false, true]
-        : [false, true];
+    const autoplayPolicy = resolveNavigatorAutoplayPolicy(el);
+    const orderedMutedStates = resolveAutoplayMutedStates(
+      preferMutedAutoplay,
+      autoplayPolicy,
+    );
 
     for (const mutedState of orderedMutedStates) {
       const hasPlayed = await playWithMutedState(mutedState);
@@ -399,6 +441,10 @@ export function useMusicPlayer() {
       void recoverPlayback(preferMutedAutoplay);
     };
 
+    canPlayThroughHandler = () => {
+      void recoverPlayback(preferMutedAutoplay);
+    };
+
     pageShowHandler = () => {
       void recoverPlayback(preferMutedAutoplay);
     };
@@ -417,7 +463,20 @@ export function useMusicPlayer() {
       audioPlayer.value.volume = volume.value;
       audioPlayer.value.preload = "auto";
       syncAudioMutedState();
-      audioPlayer.value.addEventListener("canplay", canPlayHandler);
+      const currentCanPlayHandler = canPlayHandler;
+      const currentCanPlayThroughHandler = canPlayThroughHandler;
+
+      if (currentCanPlayHandler) {
+        audioPlayer.value.addEventListener("canplay", currentCanPlayHandler);
+      }
+
+      if (currentCanPlayThroughHandler) {
+        audioPlayer.value.addEventListener(
+          "canplaythrough",
+          currentCanPlayThroughHandler,
+        );
+      }
+
       audioPlayer.value.load();
     }
 
@@ -441,6 +500,13 @@ export function useMusicPlayer() {
 
     if (canPlayHandler && audioPlayer.value) {
       audioPlayer.value.removeEventListener("canplay", canPlayHandler);
+    }
+
+    if (canPlayThroughHandler && audioPlayer.value) {
+      audioPlayer.value.removeEventListener(
+        "canplaythrough",
+        canPlayThroughHandler,
+      );
     }
 
     if (pageShowHandler) {

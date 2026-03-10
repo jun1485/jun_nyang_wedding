@@ -49,6 +49,8 @@ export function useGuestbookSection() {
   const editingEntryId = ref<number | null>(null);
   const editingMessage = ref("");
   const editingPassword = ref("");
+  // 댓글 목록 카드 템플릿 참조
+  const listCardRef = ref<HTMLElement | null>(null);
   // #endregion
 
   // #region 프로세스 생성
@@ -280,7 +282,8 @@ export function useGuestbookSection() {
     password.value = "";
   }
 
-  function goToPage(page: number) {
+  // 페이지 이동 후 댓글 목록 최상단 스크롤
+  async function goToPage(page: number) {
     if (isLoadingEntries.value || page === currentPage.value) {
       return;
     }
@@ -289,7 +292,8 @@ export function useGuestbookSection() {
       return;
     }
 
-    void fetchEntries(page);
+    await fetchEntries(page);
+    listCardRef.value?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function goToPrevPage() {
@@ -501,6 +505,7 @@ export function useGuestbookSection() {
   return {
     sharedStyles,
     guestbookStyles,
+    listCardRef,
     authorName,
     message,
     password,

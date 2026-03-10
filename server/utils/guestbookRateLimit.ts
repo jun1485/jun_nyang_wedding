@@ -8,9 +8,9 @@ interface GuestbookRateLimitGlobalState {
   __guestbookRateLimitMap?: Map<string, GuestbookRateLimitEntry>;
 }
 
-const GUESTBOOK_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const GUESTBOOK_RATE_LIMIT_MAX_SUBMISSIONS = 3;
-const GUESTBOOK_RATE_LIMIT_MIN_INTERVAL_MS = 30 * 1000;
+const GUESTBOOK_RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000;
+const GUESTBOOK_RATE_LIMIT_MAX_SUBMISSIONS = 5;
+const GUESTBOOK_RATE_LIMIT_MIN_INTERVAL_MS = 60 * 1000;
 const LOCALHOST_HOSTNAME_LIST = ["localhost", "127.0.0.1"];
 
 function getGuestbookRateLimitGlobalState(): typeof globalThis & GuestbookRateLimitGlobalState {
@@ -82,7 +82,7 @@ export function assertGuestbookSubmissionAllowed(event: H3Event): void {
   if (recentSubmittedAtMsList.length >= GUESTBOOK_RATE_LIMIT_MAX_SUBMISSIONS) {
     throw createError({
       statusCode: 429,
-      statusMessage: "댓글 등록 횟수가 잠시 제한되었습니다. 10분 후 다시 시도해 주세요.",
+      statusMessage: "댓글 등록 횟수가 잠시 제한되었습니다. 30분 후 다시 시도해 주세요.",
     });
   }
 
