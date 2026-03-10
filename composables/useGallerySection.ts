@@ -1,3 +1,4 @@
+import type { ComponentPublicInstance } from "vue";
 import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, triggerRef } from "vue";
 import { useEmotionStyles } from "~/composables/useEmotionStyles";
 import { useGalleryLazyLoad } from "~/composables/useGalleryLazyLoad";
@@ -636,7 +637,7 @@ export function useGallerySection() {
   }
 
   // 마운트 시점에 이미 complete 상태인 이미지 로드 완료 처리
-  function registerAllPhotosImage(el: Element | null, imageSrc: string) {
+  function registerAllPhotosImage(el: Element | ComponentPublicInstance | null, imageSrc: string) {
     if (!(el instanceof HTMLImageElement)) return;
     if (!el.complete || el.naturalWidth <= 0) return;
     markAllPhotosImageLoaded(imageSrc);

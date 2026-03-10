@@ -44,7 +44,7 @@ const sharedStyles = withEmotionLabels("shared", {
   `,
   shared__sectionSubtitle: `
     margin: 0;
-    font-size: 0.95rem;
+    font-size: calc(1.05rem + 3px);
     color: var(--text-sub);
   `,
   shared__floralChip: `
@@ -59,7 +59,7 @@ const sharedStyles = withEmotionLabels("shared", {
     border: 1px solid rgba(231, 90, 132, 0.25);
     background: rgba(255, 248, 250, 0.88);
     color: #8f4762;
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 3px);
     font-weight: 700;
     line-height: 1;
     text-transform: uppercase;
@@ -284,7 +284,7 @@ const homeStyles = withEmotionLabels("home", {
   `,
   home__nameValue: `
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     font-weight: 500;
 
     @media (min-width: ${SM_BREAKPOINT}) {
@@ -293,7 +293,7 @@ const homeStyles = withEmotionLabels("home", {
   `,
   home__nameRole: `
     margin: 0.25rem 0 0;
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 3px);
     text-transform: uppercase;
     letter-spacing: 0.2em;
     color: #8c6d7c;
@@ -321,8 +321,8 @@ const homeStyles = withEmotionLabels("home", {
   `,
   home__dateText: `
     margin: 0;
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 1.3rem;
+    font-weight: 600;
     color: #624652;
 
     @media (min-width: ${SM_BREAKPOINT}) {
@@ -331,7 +331,7 @@ const homeStyles = withEmotionLabels("home", {
   `,
   home__venueText: `
     margin: 0.25rem 0 0;
-    font-size: 0.875rem;
+    font-size: calc(1.075rem + 3px);
     color: #7a5b68;
 
     @media (min-width: ${SM_BREAKPOINT}) {
@@ -364,7 +364,7 @@ const contactStyles = withEmotionLabels("contact", {
     border: 1px solid rgba(231, 90, 132, 0.25);
     background: rgba(255, 248, 250, 0.88);
     color: #8f4762;
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 3px);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -409,16 +409,16 @@ const contactStyles = withEmotionLabels("contact", {
     }
   `,
   contact__cardInner: `
-    padding: 1.25rem 1rem;
+    padding: 1.25rem 0.5rem;
 
     @media (min-width: ${SM_BREAKPOINT}) {
       padding: 1.75rem 1.5rem;
     }
   `,
   contact__sectionLabel: `
-    margin: 0;
+    margin: 0 0.5rem;
     color: #422f39;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 700;
   `,
   contact__contactList: `
@@ -433,13 +433,13 @@ const contactStyles = withEmotionLabels("contact", {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.9rem;
+    gap: 0.3rem;
     border: 1px solid rgba(231, 90, 132, 0.14);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 248, 251, 0.9));
     border-radius: 1.15rem;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
-    padding: 0.9rem 0.95rem;
+    padding: 0.9rem 0.7rem;
   `,
   contact__contactContent: `
     min-width: 0;
@@ -448,13 +448,13 @@ const contactStyles = withEmotionLabels("contact", {
   contact__contactName: `
     margin: 0;
     color: #4c3540;
-    font-size: 1.06rem;
+    font-size: 1.2rem;
     font-weight: 700;
   `,
   contact__contactNumber: `
     margin: 0.18rem 0 0;
     color: #7f6470;
-    font-size: 0.9rem;
+    font-size: calc(1rem + 3px);
     letter-spacing: 0.01em;
     word-break: break-all;
   `,
@@ -472,7 +472,7 @@ const contactStyles = withEmotionLabels("contact", {
       inset 0 1px 0 rgba(255, 255, 255, 0.88);
     color: #b34167;
     font-family: inherit;
-    font-size: 0.84rem;
+    font-size: calc(0.84rem + 3px);
     font-weight: 800;
     line-height: 1;
     letter-spacing: 0.01em;
@@ -506,11 +506,4 @@ const contactStyles = withEmotionLabels("contact", {
 } as const);
 // #endregion
 
-
-export {
-  sharedStyles,
-  appStyles,
-  homeStyles,
-  contactStyles,
-};
-
+export { sharedStyles, appStyles, homeStyles, contactStyles };

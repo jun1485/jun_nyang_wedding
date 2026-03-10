@@ -80,9 +80,10 @@
       :src="currentSrc"
       :muted="audioMuted"
       :defaultMuted="audioMuted"
-      preload="metadata"
+      preload="auto"
       autoplay
       playsinline
+      webkit-playsinline="true"
       @ended="nextTrack"
     >
       Your browser does not support the audio element.

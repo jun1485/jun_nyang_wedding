@@ -1,9 +1,14 @@
-import { GOOGLE_FONT_STYLESHEET_URL } from "./composables/useFontPreset";
+import {
+  ACTIVE_FONT_ASSET_PATH,
+  ACTIVE_FONT_FAMILY,
+  GOOGLE_FONT_STYLESHEET_URL,
+} from "./composables/useFontPreset";
 
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: true },
   modules: ["@pinia/nuxt", "@vite-pwa/nuxt"],
+  css: ["~/assets/css/fonts.css"],
   vite: {
     build: {
       rollupOptions: {
@@ -79,12 +84,52 @@ export default defineNuxtConfig({
           href: "https://fonts.gstatic.com",
           crossorigin: "anonymous",
         },
+        ...(ACTIVE_FONT_ASSET_PATH == null
+          ? []
+          : [
+              {
+                rel: "preload",
+                href: ACTIVE_FONT_ASSET_PATH,
+                as: "font",
+                type: "font/ttf",
+              },
+            ]),
         {
           rel: "stylesheet",
           href: GOOGLE_FONT_STYLESHEET_URL,
         },
         { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
         { rel: "icon", type: "image/png", href: "/pwa-192.png" },
+      ],
+      style: [
+        {
+          key: "active-font-bootstrap",
+          children: `
+            :root { --font-main: ${ACTIVE_FONT_FAMILY}; }
+            html,
+            body,
+            button,
+            input,
+            select,
+            textarea,
+            a,
+            p,
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            span,
+            div,
+            li,
+            label,
+            strong,
+            small {
+              font-family: var(--font-main), sans-serif;
+            }
+          `,
+        },
       ],
     },
   },

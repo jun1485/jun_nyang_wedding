@@ -70,7 +70,7 @@
         </form>
       </article>
 
-      <article :class="[sharedStyles.shared__sectionCard, guestbookStyles.guestbook__listCard]">
+      <article ref="listCardRef" :class="[sharedStyles.shared__sectionCard, guestbookStyles.guestbook__listCard]">
         <div :class="guestbookStyles.guestbook__listHeader">
           <h3 :class="guestbookStyles.guestbook__listTitle">최근 댓글</h3>
           <button
@@ -149,10 +149,6 @@
           </ul>
 
           <div :class="guestbookStyles.guestbook__pagination">
-            <p :class="guestbookStyles.guestbook__listStatus">
-              {{ paginationStatusText }}
-            </p>
-
             <div
               v-if="isPaginationVisible"
               :class="guestbookStyles.guestbook__pageButtonRow"
@@ -203,6 +199,7 @@ import { useGuestbookSection } from "~/composables/useGuestbookSection";
 const {
   sharedStyles,
   guestbookStyles,
+  listCardRef,
   authorName,
   message,
   password,
@@ -216,7 +213,6 @@ const {
   hasNextPage,
   isPaginationVisible,
   pageNumbers,
-  paginationStatusText,
   nameLengthText,
   messageLengthText,
   passwordLengthText,

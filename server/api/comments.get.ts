@@ -6,15 +6,11 @@ import { isGuestbookEnabled, listGuestbookEntriesPage } from "../utils/guestbook
 const GUESTBOOK_PAGE_SIZE = 5;
 // #endregion
 
-function resolvePageQueryValue(
-  pageValue: string | string[] | null | undefined,
-): number {
-  const normalizedPageValue = Array.isArray(pageValue)
-    ? pageValue[0]
-    : pageValue;
-  const parsedPage = Number.parseInt(normalizedPageValue ?? "1", 10);
+// 쿼리 파라미터 page 값 정수 변환
+function resolvePageQueryValue(rawValue: unknown): number {
+  const parsedPage = Number(rawValue);
 
-  if (Number.isNaN(parsedPage) || parsedPage < 1) {
+  if (!Number.isInteger(parsedPage) || parsedPage < 1) {
     return 1;
   }
 

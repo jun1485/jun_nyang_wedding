@@ -34,7 +34,7 @@ const countdownStyles = withEmotionLabels("countdown", {
   countdown__calendarMonthLabel: `
     margin: 0 0 0.18rem;
     color: #8f91ad;
-    font-size: 0.62rem;
+    font-size: calc(0.62rem + 3px);
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -85,7 +85,7 @@ const countdownStyles = withEmotionLabels("countdown", {
     isolation: isolate;
     min-height: 1.7rem;
     color: #cf2b3a;
-    font-size: 0.98rem;
+    font-size: calc(0.98rem + 3px);
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.68);
 
     &::before {
@@ -109,7 +109,7 @@ const countdownStyles = withEmotionLabels("countdown", {
     font-family: var(--font-main), sans-serif;
     font-weight: 700;
     letter-spacing: 0.06em;
-    font-size: 0.875rem;
+    font-size: calc(1.075rem + 3px);
 
     @media (min-width: ${SM_BREAKPOINT}) {
       font-size: 1rem;
@@ -142,7 +142,7 @@ const countdownStyles = withEmotionLabels("countdown", {
   countdown__label: `
     margin: 0.2rem 0 0;
     color: #8d6f7d;
-    font-size: 0.72rem;
+    font-size: calc(0.72rem + 3px);
     letter-spacing: 0.07em;
     text-transform: uppercase;
   `,
@@ -234,7 +234,7 @@ const galleryStyles = withEmotionLabels("gallery", {
       rgba(227, 102, 138, 0.92)
     );
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 700;
     letter-spacing: 0.03em;
     padding: 0.58rem 1.15rem;
@@ -683,7 +683,7 @@ const galleryStyles = withEmotionLabels("gallery", {
   `,
   gallery__thumbLoadingText: `
     color: rgba(255, 255, 255, 0.94);
-    font-size: 0.72rem;
+    font-size: calc(0.72rem + 3px);
     font-weight: 700;
     letter-spacing: 0.04em;
   `,
@@ -694,7 +694,7 @@ const galleryStyles = withEmotionLabels("gallery", {
     background: linear-gradient(to top, rgba(31, 19, 24, 0.66), transparent);
     padding: 0.6rem 0.78rem 0.52rem;
     text-align: left;
-    font-size: 0.72rem;
+    font-size: calc(0.72rem + 3px);
     letter-spacing: 0.04em;
     color: #fff;
   `,
@@ -826,7 +826,7 @@ const galleryStyles = withEmotionLabels("gallery", {
   `,
   gallery__lightboxLoadingText: `
     color: rgba(255, 255, 255, 0.92);
-    font-size: 0.83rem;
+    font-size: calc(0.83rem + 3px);
     font-weight: 700;
     letter-spacing: 0.03em;
   `,
@@ -990,7 +990,7 @@ const galleryStyles = withEmotionLabels("gallery", {
     border-radius: 9999px;
     background: rgba(255, 255, 255, 0.15);
     padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 3px);
     color: #fff;
     backdrop-filter: blur(4px);
   `,
@@ -1009,7 +1009,7 @@ const galleryStyles = withEmotionLabels("gallery", {
     border-radius: 9999px;
     background: rgba(28, 20, 24, 0.58);
     color: #fff;
-    font-size: 0.82rem;
+    font-size: calc(0.95rem + 3px);
     font-weight: 600;
     padding: 0.4rem 0.9rem;
     cursor: pointer;
@@ -1055,7 +1055,7 @@ const invitationStyles = withEmotionLabels("invitation", {
   invitation__body: `
     margin-top: 1.25rem;
     color: #4f3b46;
-    font-size: 0.98rem;
+    font-size: calc(1.05rem + 3px);
     line-height: 2rem;
     font-weight: 400;
 
@@ -1090,6 +1090,7 @@ const invitationStyles = withEmotionLabels("invitation", {
   invitation__nameText: `
     margin: 0;
     font-weight: 700;
+    font-size: 1.5rem;
   `,
   invitation__heart: `
     margin: 0;
@@ -1239,7 +1240,7 @@ const musicPlayerStyles = withEmotionLabels("music-player", {
   `,
   "music-player__label": `
     color: #8c5a70;
-    font-size: 0.95rem;
+    font-size: calc(0.95rem + 3px);
     font-weight: 700;
     letter-spacing: 0.08em;
     padding: 0 0.38rem 0 0.12rem;
@@ -1271,7 +1272,7 @@ const venueStyles = withEmotionLabels("venue", {
     border: 1px solid rgba(231, 90, 132, 0.25);
     background: rgba(255, 248, 250, 0.88);
     color: #8f4762;
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 3px);
     font-weight: 700;
     line-height: 1;
     text-transform: uppercase;
@@ -1307,12 +1308,12 @@ const venueStyles = withEmotionLabels("venue", {
     }
   `,
   venue__venueInfo: `
-    margin-top: 1.5rem;
+    margin-top: 1.2rem;
     text-align: center;
   `,
   venue__venueName: `
     margin: 0;
-    font-size: 1.125rem;
+    font-size: 1.425rem;
     font-weight: 700;
 
     @media (min-width: ${SM_BREAKPOINT}) {
@@ -1321,7 +1322,7 @@ const venueStyles = withEmotionLabels("venue", {
   `,
   venue__venueAddress: `
     margin: 0.5rem 0 0;
-    font-size: 0.875rem;
+    font-size: calc(1.075rem + 3px);
     color: #71535f;
 
     @media (min-width: ${SM_BREAKPOINT}) {
@@ -1360,7 +1361,7 @@ const venueStyles = withEmotionLabels("venue", {
     border: 1px solid rgba(255, 255, 255, 0.7);
     background-color: rgba(255, 255, 255, 0.92);
     color: #563f4b;
-    font-size: 0.78rem;
+    font-size: calc(0.78rem + 3px);
     font-weight: 700;
     text-decoration: none;
     padding: 0.42rem 0.7rem;
@@ -1370,7 +1371,7 @@ const venueStyles = withEmotionLabels("venue", {
   `,
   venue__transportTitle: `
     margin: 0;
-    font-size: 1.125rem;
+    font-size: 1.425rem;
     font-weight: 700;
     color: #432f39;
 
@@ -1395,13 +1396,13 @@ const venueStyles = withEmotionLabels("venue", {
   `,
   venue__transportType: `
     margin: 0;
-    font-size: 0.875rem;
+    font-size: calc(1.075rem + 3px);
     font-weight: 700;
     color: #5f4552;
   `,
   venue__transportDetails: `
     margin: 0.25rem 0 0;
-    font-size: 0.875rem;
+    font-size: calc(0.975rem + 3px);
     color: #6f5864;
     white-space: pre-line;
   `,
@@ -1415,7 +1416,7 @@ const venueStyles = withEmotionLabels("venue", {
     min-width: min(100%, 11rem);
     min-height: 2.8rem;
     width: min(100%, 12.5rem);
-    font-size: 0.98rem;
+    font-size: calc(1.1rem + 3px);
     line-height: 1.15;
     letter-spacing: 0.01em;
     padding: 0.8rem 0.85rem;
@@ -1445,7 +1446,6 @@ const flowerPetalStyles = withEmotionLabels("flower-petal", {
 } as const);
 // #endregion
 
-
 export {
   countdownStyles,
   galleryStyles,
@@ -1454,4 +1454,3 @@ export {
   venueStyles,
   flowerPetalStyles,
 };
-
