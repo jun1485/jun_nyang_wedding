@@ -321,7 +321,7 @@ const homeStyles = withEmotionLabels("home", {
   `,
   home__dateText: `
     margin: 0;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #624652;
 
@@ -331,11 +331,11 @@ const homeStyles = withEmotionLabels("home", {
   `,
   home__venueText: `
     margin: 0.25rem 0 0;
-    font-size: calc(1.075rem + 3px);
+    font-size: calc(0.9rem + 3px);
     color: #7a5b68;
 
     @media (min-width: ${SM_BREAKPOINT}) {
-      font-size: 1.125rem;
+      font-size: 1rem;
     }
   `,
 } as const);
