@@ -213,7 +213,7 @@ const guestbookStyles = withEmotionLabels("guestbook", {
     margin: 0.3rem 0 0;
     color: #5d4651;
     font-size: calc(1rem + 2px);
-    line-height: 1.65;
+    line-height: 1.4;
     white-space: pre-line;
     word-break: break-word;
   `,

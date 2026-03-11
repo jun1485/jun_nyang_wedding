@@ -1308,12 +1308,12 @@ const venueStyles = withEmotionLabels("venue", {
     }
   `,
   venue__venueInfo: `
-    margin-top: 1.2rem;
+    margin-top: 1rem;
     text-align: center;
   `,
   venue__venueName: `
     margin: 0;
-    font-size: 1.425rem;
+    font-size: 1.2rem;
     font-weight: 700;
 
     @media (min-width: ${SM_BREAKPOINT}) {
@@ -1322,7 +1322,7 @@ const venueStyles = withEmotionLabels("venue", {
   `,
   venue__venueAddress: `
     margin: 0.5rem 0 0;
-    font-size: calc(1.075rem + 3px);
+    font-size: calc(0.9rem + 3px);
     color: #71535f;
 
     @media (min-width: ${SM_BREAKPOINT}) {
