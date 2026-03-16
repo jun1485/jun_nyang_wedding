@@ -96,7 +96,10 @@ const { openDialog } = useCommonDialog();
 const encodedAddress = computed(() =>
   encodeURIComponent(store.venue?.address || ""),
 );
-const encodedName = computed(() => encodeURIComponent(store.venue?.name || ""));
+// 지도 검색용 venue name에서 괄호 층수 정보 제거
+const encodedName = computed(() =>
+  encodeURIComponent((store.venue?.name || "").replace(/\s*\(.*\)$/, "")),
+);
 
 const mapQuery = computed(() => encodedName.value || encodedAddress.value);
 const mapEmbedSrc = computed(
