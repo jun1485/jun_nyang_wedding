@@ -506,6 +506,57 @@ const adminStyles = withEmotionLabels("admin", {
     text-align: center;
     padding: 1rem;
   `,
+  admin__pagination: `
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+  `,
+  admin__pageButtonRow: `
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+  `,
+  admin__pageButton: `
+    min-width: 2.35rem;
+    min-height: 2.35rem;
+    border: 1px solid rgba(231, 90, 132, 0.18);
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #8a5367;
+    font-size: calc(0.82rem + 2px);
+    font-weight: 700;
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease,
+      color 180ms ease,
+      transform 180ms ease;
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+      transform: none;
+    }
+  `,
+  admin__pageButtonActive: `
+    border-color: rgba(214, 78, 117, 0.9);
+    background: linear-gradient(135deg, #d64e75, #e26d93);
+    color: #ffffff;
+    box-shadow: 0 8px 16px rgba(214, 78, 117, 0.18);
+  `,
+  admin__paginationStatus: `
+    color: #876876;
+    font-size: calc(0.84rem + 2px);
+  `,
   admin__quotaCard: `
     margin-top: 1rem;
     padding: 1rem;

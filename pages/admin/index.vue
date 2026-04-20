@@ -100,7 +100,7 @@
               :class="adminStyles.admin__secondaryButton"
               @click="toggleAllComments"
             >
-              {{ selectedCommentCount === overview.guestbook.recentEntries.length ? "전체 해제" : "전체 선택" }}
+              {{ selectedCommentCount === commentEntries.length ? "전체 해제" : "전체 선택" }}
             </button>
             <button
               type="button"
@@ -113,11 +113,12 @@
           </div>
 
           <ul
-            v-if="overview.guestbook.recentEntries.length > 0"
+            v-if="commentEntries.length > 0"
+            ref="commentListRef"
             :class="adminStyles.admin__commentList"
           >
             <li
-              v-for="entry in overview.guestbook.recentEntries"
+              v-for="entry in commentEntries"
               :key="entry.id"
               :class="adminStyles.admin__commentItem"
             >
@@ -141,7 +142,48 @@
             </li>
           </ul>
           <div v-else :class="adminStyles.admin__commentEmpty">
-            최근 댓글 없음
+            댓글 없음
+          </div>
+
+          <div :class="adminStyles.admin__pagination">
+            <div
+              v-if="isPaginationVisible"
+              :class="adminStyles.admin__pageButtonRow"
+            >
+              <button
+                type="button"
+                :disabled="!hasPrevPage || isLoading"
+                :class="adminStyles.admin__pageButton"
+                @click="goToPrevPage"
+              >
+                이전
+              </button>
+
+              <button
+                v-for="page in pageNumbers"
+                :key="`admin-page-${page}`"
+                type="button"
+                :class="[
+                  adminStyles.admin__pageButton,
+                  page === currentPage
+                    ? adminStyles.admin__pageButtonActive
+                    : '',
+                ]"
+                @click="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+
+              <button
+                type="button"
+                :disabled="!hasNextPage || isLoading"
+                :class="adminStyles.admin__pageButton"
+                @click="goToNextPage"
+              >
+                다음
+              </button>
+            </div>
+            <span :class="adminStyles.admin__paginationStatus">{{ paginationStatusText }}</span>
           </div>
         </article>
 
@@ -232,15 +274,26 @@ const {
   adminStyles,
   adminKey,
   overview,
+  commentEntries,
+  currentPage,
   isLoading,
   statusMessage,
   formatBytes,
   formatDateTime,
   selectedCommentCount,
   deleteDisabled,
+  hasPrevPage,
+  hasNextPage,
+  isPaginationVisible,
+  pageNumbers,
+  paginationStatusText,
+  commentListRef,
   isCommentSelected,
   toggleCommentSelection,
   toggleAllComments,
+  goToPage,
+  goToPrevPage,
+  goToNextPage,
   handleSubmit,
   handleDeleteSelectedComments,
   clearAdminSession,

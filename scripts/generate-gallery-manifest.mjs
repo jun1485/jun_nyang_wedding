@@ -35,13 +35,25 @@ async function readExistingManifest(manifestPath) {
   }
 }
 
+// 신규 파일 자연정렬 위치 삽입
 function createOrderedManifest(files, existingOrder) {
   const currentSet = new Set(files);
   const preservedOrder = existingOrder.filter((fileName) => currentSet.has(fileName));
   const preservedSet = new Set(preservedOrder);
   const newFiles = files.filter((fileName) => !preservedSet.has(fileName));
 
-  return [...preservedOrder, ...newFiles];
+  const result = [...preservedOrder];
+  for (const newFile of newFiles) {
+    const insertIndex = result.findIndex(
+      (existing) => GALLERY_ORDER_COLLATOR.compare(existing, newFile) > 0,
+    );
+    if (insertIndex === -1) {
+      result.push(newFile);
+    } else {
+      result.splice(insertIndex, 0, newFile);
+    }
+  }
+  return result;
 }
 
 async function main() {
