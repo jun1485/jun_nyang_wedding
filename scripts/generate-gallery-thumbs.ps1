@@ -24,6 +24,29 @@ $jpegEncoder = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() |
   Where-Object { $_.MimeType -eq "image/jpeg" } |
   Select-Object -First 1
 
+# EXIF orientation 값을 RotateFlipType 으로 매핑
+function Get-ExifRotateFlip {
+  param([System.Drawing.Image]$Image)
+
+  $orientationId = 0x0112
+  $hasOrientation = $Image.PropertyIdList -contains $orientationId
+  if (-not $hasOrientation) {
+    return [System.Drawing.RotateFlipType]::RotateNoneFlipNone
+  }
+
+  $orientationValue = $Image.GetPropertyItem($orientationId).Value[0]
+  switch ($orientationValue) {
+    2 { return [System.Drawing.RotateFlipType]::RotateNoneFlipX }
+    3 { return [System.Drawing.RotateFlipType]::Rotate180FlipNone }
+    4 { return [System.Drawing.RotateFlipType]::Rotate180FlipX }
+    5 { return [System.Drawing.RotateFlipType]::Rotate90FlipX }
+    6 { return [System.Drawing.RotateFlipType]::Rotate90FlipNone }
+    7 { return [System.Drawing.RotateFlipType]::Rotate270FlipX }
+    8 { return [System.Drawing.RotateFlipType]::Rotate270FlipNone }
+    default { return [System.Drawing.RotateFlipType]::RotateNoneFlipNone }
+  }
+}
+
 Get-ChildItem -Path $resolvedSourceDir -File |
   Where-Object { $_.Extension -match "^\.(jpg|jpeg|png|webp)$" } |
   ForEach-Object {
@@ -32,6 +55,12 @@ Get-ChildItem -Path $resolvedSourceDir -File |
     $image = [System.Drawing.Image]::FromFile($sourcePath)
 
     try {
+      # 원본 EXIF orientation 선반영 후 축소 처리
+      $rotateFlip = Get-ExifRotateFlip -Image $image
+      if ($rotateFlip -ne [System.Drawing.RotateFlipType]::RotateNoneFlipNone) {
+        $image.RotateFlip($rotateFlip)
+      }
+
       $scale = $TargetWidth / $image.Width
       if ($scale -gt 1) {
         $scale = 1
