@@ -7,8 +7,7 @@
     "minimumCacheTTL": 3600,
     "localPatterns": [
       {
-        "pathname": "^/gallery/.*$",
-        "search": ""
+        "pathname": "^/gallery/.*$"
       }
     ],
     "remotePatterns": [
@@ -16,8 +15,7 @@
         "protocol": "https",
         "hostname": "^.*\\.public\\.blob\\.vercel-storage\\.com$",
         "port": "",
-        "pathname": "^/gallery/.*$",
-        "search": ""
+        "pathname": "^/gallery/.*$"
       }
     ]
   }
