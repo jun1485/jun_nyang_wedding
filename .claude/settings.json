@@ -7,7 +7,9 @@
       "Bash(export PATH=\"/c/Program Files/Volta:$PATH\")",
       "Read(//c/Users/joon1/**)",
       "Bash(export VOLTA_HOME=\"/c/Users/joon1/AppData/Local/Volta\")",
-      "Bash(export PATH=\"$VOLTA_HOME/bin:$PATH\")"
+      "Bash(export PATH=\"$VOLTA_HOME/bin:$PATH\")",
+      "PowerShell(pwsh -File scripts/normalize-gallery-exif.ps1)",
+      "PowerShell(pwsh -File scripts/generate-gallery-thumbs.ps1)"
     ]
   }
 }
