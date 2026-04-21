@@ -70,13 +70,25 @@ function isLocalOrigin(origin: string): boolean {
   return /localhost|127\.0\.0\.1|0\.0\.0\.0/.test(origin);
 }
 
-function createOptimizedRemoteThumbSrc(event: H3Event, sourceUrl: string): string {
+// Blob 업로드 시각 기반 캐시버스터 URL 생성
+function createVersionedBlobUrl(sourceUrl: string, uploadedAt: Date): string {
+  const version = uploadedAt.getTime();
+  const separator = sourceUrl.includes("?") ? "&" : "?";
+  return `${sourceUrl}${separator}v=${version}`;
+}
+
+function createOptimizedRemoteThumbSrc(
+  event: H3Event,
+  sourceUrl: string,
+  uploadedAt: Date,
+): string {
   const origin = getRequestURL(event).origin;
+  const versionedUrl = createVersionedBlobUrl(sourceUrl, uploadedAt);
   if (isLocalOrigin(origin)) {
-    return sourceUrl;
+    return versionedUrl;
   }
 
-  const encodedSourceUrl = encodeURIComponent(sourceUrl);
+  const encodedSourceUrl = encodeURIComponent(versionedUrl);
   return `/_vercel/image?url=${encodedSourceUrl}&w=480&q=75`;
 }
 
@@ -147,8 +159,8 @@ export default defineEventHandler(async (event): Promise<GalleryImage[]> => {
           ),
         )
         .map((item) => ({
-          thumbSrc: createOptimizedRemoteThumbSrc(event, item.url),
-          fullSrc: item.url,
+          thumbSrc: createOptimizedRemoteThumbSrc(event, item.url, item.uploadedAt),
+          fullSrc: createVersionedBlobUrl(item.url, item.uploadedAt),
           alt: createAltText(item.pathname),
         }));
     }
