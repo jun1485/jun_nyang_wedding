@@ -33,7 +33,7 @@
 
       <p :class="invitationStyles.invitation__body">
         <span
-          v-for="(line, index) in store.invitationMessage ?? []"
+          v-for="(line, index) in invitationMessageLines"
           :key="index"
           :class="[
             invitationStyles.invitation__messageLine,
@@ -47,13 +47,19 @@
       </p>
 
       <div :class="invitationStyles.invitation__namesWrap">
-        <div :class="invitationStyles.invitation__namesRow">
-          <p :class="invitationStyles.invitation__nameText">
-            {{ store.groom?.name }}
+        <div
+          v-for="familyNameLine in familyNameLines"
+          :key="familyNameLine.relation"
+          :class="invitationStyles.invitation__namesRow"
+        >
+          <p :class="invitationStyles.invitation__parentsText">
+            {{ familyNameLine.parentsText }}의
           </p>
-          <p :class="invitationStyles.invitation__heart"></p>
+          <p :class="invitationStyles.invitation__relationText">
+            {{ familyNameLine.relation }}
+          </p>
           <p :class="invitationStyles.invitation__nameText">
-            {{ store.bride?.name }}
+            {{ familyNameLine.name }}
           </p>
         </div>
       </div>
@@ -62,15 +68,13 @@
 </template>
 
 <script setup lang="ts">
-import { useEmotionStyles } from "~/composables/useEmotionStyles";
-import { useWeddingStore } from "~/stores/wedding";
+import { useInvitationSection } from "~/composables/useInvitationSection";
 
-const store = useWeddingStore();
-const { sharedStyles, invitationStyles } = useEmotionStyles();
-
-const MESSAGE_SECTION_BREAK_LINE = "이제 평생을 약속하려 합니다.";
-
-function isMessageSectionBreak(line: string): boolean {
-  return line === MESSAGE_SECTION_BREAK_LINE;
-}
+const {
+  sharedStyles,
+  invitationStyles,
+  invitationMessageLines,
+  familyNameLines,
+  isMessageSectionBreak,
+} = useInvitationSection();
 </script>

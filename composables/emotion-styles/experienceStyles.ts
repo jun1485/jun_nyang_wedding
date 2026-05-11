@@ -1080,17 +1080,36 @@ const invitationStyles = withEmotionLabels("invitation", {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    font-size: 1.3rem;
+    gap: 0.42rem;
+    color: #4f3b46;
+    font-size: 1rem;
+    line-height: 1.7;
+
+    & + & {
+      margin-top: 0.45rem;
+    }
 
     @media (min-width: ${SM_BREAKPOINT}) {
-      font-size: 1.25rem;
+      font-size: 1.08rem;
     }
+  `,
+  invitation__parentsText: `
+    margin: 0;
+    font-weight: 400;
+  `,
+  invitation__relationText: `
+    margin: 0;
+    color: #8b5c68;
+    font-weight: 700;
   `,
   invitation__nameText: `
     margin: 0;
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 1.18rem;
+
+    @media (min-width: ${SM_BREAKPOINT}) {
+      font-size: 1.28rem;
+    }
   `,
   invitation__heart: `
     margin: 0;
