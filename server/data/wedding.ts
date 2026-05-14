@@ -18,7 +18,7 @@ const GROOM_REMITTANCE_ACCOUNTS: RemittanceAccount[] = [
   {
     label: "신랑 어머니 장성애",
     bank: "농협은행",
-    accountNumber: "351-0465-4608-03",
+    accountNumber: "351-0467-4608-03",
   },
 ];
 
